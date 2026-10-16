@@ -32,6 +32,7 @@ open(os.path.join(here, 'es192-8a-shape-demos.html'), 'w', encoding='utf-8').wri
 cut = body.index('<div class="app">')
 doc = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
        '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+       '<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%23a51c30%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%279%27 fill=%27none%27 stroke=%27white%27 stroke-width=%273%27/%3E%3C/svg%3E">\n'
        '<meta name="description" content="ES 192 interactive: how shape (tubes, walls, cells, lattices, corrugation) and the microstructure inside decide stiffness, strength and failure.">\n'
        + body[:cut] + '</head>\n<body>\n' + body[cut:] + '</body>\n</html>\n')
 os.makedirs(os.path.join(here, 'site'), exist_ok=True)
