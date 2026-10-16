@@ -127,6 +127,13 @@ input[type=range]{width:100%;accent-color:var(--crimson);margin:4px 0}
 .eq .v{grid-column:1/-1;font:400 .78rem var(--f-mono);color:var(--muted)}
 .eq .v b{color:var(--fg);font-weight:500}
 
+.bet{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.bet button{font:600 .9rem var(--f-body);min-width:40px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:5px;cursor:pointer;letter-spacing:0;text-transform:none}
+.bet button[aria-pressed="true"]{background:var(--crimson);border-color:var(--crimson);color:#fff}
+.bet .rnd{margin-left:auto;font-weight:500;font-size:.8rem}
+#l-bet-res{flex-basis:100%;font:600 .95rem var(--f-body);letter-spacing:0;text-transform:none;color:var(--fg);min-height:1.3em}
+#l-bet-res.win{color:var(--good)} #l-bet-res.lose{color:var(--crimson)}
+#l-bet-res span{font:500 .78rem var(--f-mono);color:var(--muted);margin-left:8px}
 /* ---------- chart panel ---------- */
 .chartp{display:flex;flex-direction:column;padding:10px 12px 8px;gap:6px}
 .ph{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
@@ -287,10 +294,13 @@ body.present svg text{font-size:13.5px}
     <div class="result" data-panel="cells" id="m-res"></div>
 
     <!-- 4 lattice -->
-    <div class="app-card" data-panel="lattice"><span class="t">Two 3D-printed Ti-6Al-4V lattices, same density</span></div>
-    <p class="q" data-panel="lattice">Same struts, same density. Why is one far stiffer?</p>
-    <div class="ctl" data-panel="lattice"><label for="l-r"><span>Relative density <span class="sym">ρ/ρ<sub>s</sub></span></span> <output id="o-lr"></output></label><input id="l-r" type="range" min="0.03" max="0.3" step="0.005" value="0.1"></div>
-    <div class="ctl" data-panel="lattice"><label for="l-P"><span>Applied stress <span class="sym">σ</span></span> <output id="o-lP"></output></label><div class="row"><input id="l-P" type="range" min="0" max="1" step="0.001" value="0.25"><button class="play" type="button" data-for="l-P" aria-label="Play load">▶</button></div></div>
+    <div class="app-card" data-panel="lattice"><span class="t">3D-printed Ti-6Al-4V lattices, same density</span></div>
+    <p class="q" data-panel="lattice">Same mass of titanium. Which lattice holds more?</p>
+    <div class="ctl" data-panel="lattice"><label><span>A</span></label><div class="seg" id="l-A" role="group" aria-label="Lattice A"><button type="button" data-t="octet" aria-pressed="false">Octet</button><button type="button" data-t="bcc" aria-pressed="false">Open</button><button type="button" data-t="gyroid" aria-pressed="false">Gyroid</button><button type="button" data-t="diamond" aria-pressed="false">Diamond</button></div></div>
+    <div class="ctl" data-panel="lattice"><label><span>B</span></label><div class="seg" id="l-B" role="group" aria-label="Lattice B"><button type="button" data-t="octet" aria-pressed="false">Octet</button><button type="button" data-t="bcc" aria-pressed="false">Open</button><button type="button" data-t="gyroid" aria-pressed="false">Gyroid</button><button type="button" data-t="diamond" aria-pressed="false">Diamond</button></div></div>
+    <div class="ctl" data-panel="lattice"><label for="l-r"><span>Relative density <span class="sym">ρ/ρ<sub>s</sub></span></span> <output id="o-lr"></output></label><input id="l-r" type="range" min="0.05" max="0.45" step="0.005" value="0.15"></div>
+    <div class="bet" id="l-bet" data-panel="lattice"><span>Your bet</span><button type="button" data-b="0" aria-pressed="false">A</button><button type="button" data-b="1" aria-pressed="false">B</button><button type="button" class="rnd" id="l-rand">Random pair</button><div id="l-bet-res"></div></div>
+    <div class="ctl" data-panel="lattice"><label for="l-P"><span>Applied stress <span class="sym">σ</span></span> <output id="o-lP"></output></label><div class="row"><input id="l-P" type="range" min="0" max="1" step="0.001" value="0.2"><button class="play" type="button" data-for="l-P" aria-label="Play load">▶</button></div></div>
     <div class="result" data-panel="lattice" id="l-res"></div>
 
     <!-- 5 sheet -->
@@ -331,9 +341,10 @@ body.present svg text{font-size:13.5px}
     <ul><li>Aligned cells ψ = ρ<sub>s</sub>/ρ (Eq 11.38, p.406). Foam E = (ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.18, p.470) and σ<sub>pl</sub> = 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub> (Eq 13.20, p.471). Aligned-cell strength σ = (ρ/ρ<sub>s</sub>)σ<sub>s</sub>.</li>
     <li>Cell-wall solid ≈ 1500 kg/m³, 35 GPa, read from the cellulose bubble on Fig 13.34. Loads are given as a fraction of F₀, the load that breaks the solid bar. Wood crushes along the grain at about 39 MPa but breaks in bending at about 70 MPa (Sitka spruce, 12% moisture, USDA Wood Handbook), so the squeezed face creases at 0.55 of the breaking load; the beam then softens and breaks on the stretched face. The foam's walls yield in compression, so its collapse starts at 0.3 × 0.55 = 0.17 F₀.</li></ul>
     <h4>Lattices</h4>
-    <ul><li>Octet truss (Fig 13.21): Maxwell M ≥ 0 (Eq 13.3, p.453), E ≈ ⅓(ρ/ρ<sub>s</sub>)E<sub>s</sub> (Eq 13.27, p.473), collapse σ ≈ ⅓(ρ/ρ<sub>s</sub>)σ<sub>s</sub> (Eq 13.28, p.474) or strut buckling 0.2(ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.29), whichever is lower.</li>
-    <li>Open (body-centred) lattice: M &lt; 0, E ≈ (ρ/ρ<sub>s</sub>)²E<sub>s</sub>, σ<sub>pl</sub> ≈ 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub>. Ti-6Al-4V as printed: E<sub>s</sub> = 115 GPa, σ<sub>s</sub> ≈ 1000 MPa (typical laser powder-bed values).</li>
-    <li>As printed, Ti-6Al-4V stretches only a few percent before it breaks, so compression tests on printed lattices end with struts snapping along a band at about 45° and the load dropping, not with a long collapse plateau. Both lattices fail that way here; the open lattice first forms plastic hinges at its joints.</li>
+    <ul><li>Octet truss (Fig 13.21): Maxwell M ≥ 0 (Eq 13.3, p.453), E ≈ ⅓(ρ/ρ<sub>s</sub>)E<sub>s</sub> (Eq 13.27, p.473), collapse σ ≈ ⅓(ρ/ρ<sub>s</sub>)σ<sub>s</sub> (Eq 13.28) or strut buckling 0.2(ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.29), whichever is lower.</li>
+    <li>Open (body-centred) lattice: M &lt; 0, E ≈ (ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.18), σ<sub>pl</sub> ≈ 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub> (Eq 13.20).</li>
+    <li>Sheet gyroid and sheet diamond TPMS: E/E<sub>s</sub> = 0.90(ρ/ρ<sub>s</sub>)<sup>1.58</sup> and 0.713(ρ/ρ<sub>s</sub>)<sup>1.21</sup>; σ/σ<sub>s</sub> = 0.536(ρ/ρ<sub>s</sub>)<sup>1.45</sup> and 0.419(ρ/ρ<sub>s</sub>)<sup>1.14</sup>. Fits to laser powder-bed Ti-6Al-4V scaffolds at ρ/ρ<sub>s</sub> 0.33–0.47 (Naghavi et al., <i>Bioengineering</i> 9 (2022) 504, Table 7); below 0.33 they are extrapolated. Surfaces: gyroid sin x cos y + sin y cos z + sin z cos x; diamond (Schwarz D). The sheet is the region |f| &lt; t, with t set so the solid fraction equals ρ/ρ<sub>s</sub>.</li>
+    <li>E<sub>s</sub> = 115 GPa, σ<sub>s</sub> ≈ 1000 MPa (as printed). As-built Ti-6Al-4V has little ductility, so strut lattices end with struts snapping along a 45° band and the load dropping; the block above the band slides down and the platen follows it. Sheet TPMS instead yield, then crush layer by layer along a long plateau (Naghavi et al. 2022).</li>
     <li>Squash in the 3D view is drawn 8× larger than the elastic strain; the ratio between the two lattices is true.</li></ul>
     <h4>Corrugation</h4>
     <ul><li>φ<sub>e</sub> = (2a+t)²/t² and φ<sub>f</sub> = (2a+t)/t (Eqs 12.8–12.9, p.436) are ideal values for a section through the wave peaks; real gains are a little lower, and deep corrugations can also buckle locally at the crest. S280GD galvanized sheet, σ<sub>y</sub> = 280 MPa. The surface first yields at M<sub>y</sub> = σ<sub>y</sub>Z; the sheet folds when the full plastic moment forms, 1.5 M<sub>y</sub> for a flat strip, falling towards 1.27 M<sub>y</sub> for a deep wave.</li></ul>
@@ -2255,11 +2266,21 @@ RIG.cells={hist:[0,0,0],histF:[0,0,0],mtype:'hex',items:[{name:'Solid bar'},{nam
 };
 
 /* =========================== 4. LATTICES =========================== */
-// Ti-6Al-4V (printed): E_s 115 GPa, sigma_s ~1000 MPa. Octet: E = rel/3 E_s (13.27), sigma = min(rel/3 sigma_s (13.28), 0.2 rel^2 E_s (13.29)).
-// Open BCC lattice (M < 0): E = rel^2 E_s (13.18), sigma_pl = 0.3 rel^1.5 sigma_s (13.20). Elastic squash drawn 8x; ratio true.
-// As-built printed Ti-6Al-4V has little ductility: tests show both lattice types failing by struts snapping along a ~45 deg band
-// (load then drops), not by layer-by-layer collapse. The open lattice first forms plastic hinges at its joints.
-const LAT={c:0.09,n:3,Es:115e3,ss:1000,rs:4430,X:8,smax:120};
+// Two printed Ti-6Al-4V lattices, same relative density, same applied stress. Each slot (A, B) can hold:
+//   octet  truss (Ashby Fig 13.21), stretch-dominated: E = rel/3 Es (13.27); sigma = min(rel/3 sigma_s (13.28), 0.2 rel^2 Es (13.29))
+//   open   BCC lattice, Maxwell M < 0 (13.3), bending-dominated: E = rel^2 Es (13.18); sigma_pl = 0.3 rel^1.5 sigma_s (13.20)
+//   gyroid sheet TPMS: E = 0.90 rel^1.58 Es, sigma = 0.536 rel^1.45 sigma_s  } Naghavi et al., Bioengineering 9 (2022) 504,
+//   diamond sheet TPMS: E = 0.713 rel^1.21 Es, sigma = 0.419 rel^1.14 sigma_s } Table 7: L-PBF Ti-6Al-4V, fitted at rel 0.33-0.47
+// Es 115 GPa, sigma_s 1000 MPa (as printed). Failure: strut lattices snap along a ~45 deg band and the load drops (as-built Ti-6Al-4V
+// has little ductility); sheet TPMS yield, then a long plateau with layer-by-layer crushing (Naghavi: elastic, yield, post-yield,
+// plateau, densification). After a strut lattice snaps, the block above the 45 deg plane slides down and the platen follows it;
+// struts of the other wedge that the platen reaches are crushed flat (displacement-controlled test).
+const LAT={c:0.09,n:3,Es:115e3,ss:1000,rs:4430,X:8,smax:160};
+const LTYPES={
+  octet:{name:'Octet truss',short:'Octet',kind:'strut',mode:'snap',E:r=>r/3,S:r=>Math.min(r/3,0.2*r*r*LAT.Es/LAT.ss),slope:1,src:'Ashby Eqs 13.27–13.29'},
+  bcc:{name:'Open lattice',short:'Open',kind:'strut',mode:'snap',E:r=>r*r,S:r=>0.3*Math.pow(r,1.5),slope:2,src:'Ashby Eqs 13.18, 13.20'},
+  gyroid:{name:'Gyroid',short:'Gyroid',kind:'tpms',mode:'plateau',E:r=>0.9*Math.pow(r,1.58),S:r=>0.536*Math.pow(r,1.45),slope:1.58,src:'Naghavi 2022'},
+  diamond:{name:'Diamond TPMS',short:'Diamond',kind:'tpms',mode:'plateau',E:r=>0.713*Math.pow(r,1.21),S:r=>0.419*Math.pow(r,1.14),slope:1.21,src:'Naghavi 2022'}};
 class SCurve extends THREE_Curve(){constructor(a){super();this.a=a;}getPoint(t,o){o=o||new THREE.Vector3();return o.set(this.a*(3*t*t-2*t*t*t-t),t-0.5,0);}}
 function THREE_Curve(){return window.THREE?THREE.Curve:class{};}
 function latticeNodesStruts(type){const c=LAT.c,n=LAT.n,key=p=>p.map(v=>Math.round(v*1e4)).join(',');const nodes=[],idx=new Map(),struts=[];
@@ -2268,81 +2289,137 @@ function latticeNodesStruts(type){const c=LAT.c,n=LAT.n,key=p=>p.map(v=>Math.rou
     for(let a=0;a<nodes.length;a++)for(let b=a+1;b<nodes.length;b++){const d=Math.hypot(nodes[a][0]-nodes[b][0],nodes[a][1]-nodes[b][1],nodes[a][2]-nodes[b][2]);if(Math.abs(d-l)<1e-6)struts.push([a,b,0]);}}
   else{for(let i=0;i<n;i++)for(let j=0;j<n;j++)for(let k=0;k<n;k++){const ce=add([(i+.5)*c,(j+.5)*c,(k+.5)*c]);for(const dx of[0,1])for(const dy of[0,1])for(const dz of[0,1])struts.push([ce,add([(i+dx)*c,(j+dy)*c,(k+dz)*c]),j]);}}
   return {nodes,struts};}
-RIG.lattice={hist:[0,0],histF:[0,0],items:[{type:'octet',x:-0.3,name:'Octet truss'},{type:'bcc',x:0.3,name:'Open lattice'}],view:{dir:[0.5,0.42,1.25],lift:-0.02},legend:['Strut strain (relative)','low','high'],
+/* ---------- sheet TPMS: solid where |f| < t; meshed with surface nets ---------- */
+const TPMSF={gyroid:(x,y,z)=>Math.sin(x)*Math.cos(y)+Math.sin(y)*Math.cos(z)+Math.sin(z)*Math.cos(x),
+  diamond:(x,y,z)=>Math.sin(x)*Math.sin(y)*Math.sin(z)+Math.sin(x)*Math.cos(y)*Math.cos(z)+Math.cos(x)*Math.sin(y)*Math.cos(z)+Math.cos(x)*Math.cos(y)*Math.sin(z)};
+const TPMS_T={};
+function tpmsThickness(type,rel){const key=type+':'+rel.toFixed(3);if(TPMS_T[key])return TPMS_T[key];
+  if(!TPMS_T['v'+type]){const f=TPMSF[type],N=36,v=[];for(let i=0;i<N;i++)for(let j=0;j<N;j++)for(let k=0;k<N;k++)v.push(Math.abs(f(2*Math.PI*(i+.5)/N,2*Math.PI*(j+.5)/N,2*Math.PI*(k+.5)/N)));v.sort((a,b)=>a-b);TPMS_T['v'+type]=v;}
+  const v=TPMS_T['v'+type];return TPMS_T[key]=v[Math.min(v.length-1,Math.floor(rel*v.length))];}
+function tpmsGeometry(type,rel){const n=LAT.n,c=LAT.c,H=n*c,R=16,N=n*R,h=H/N,D=N+3,f=TPMSF[type],t=tpmsThickness(type,rel),k=2*Math.PI/c;
+  const F=new Float32Array(D*D*D),id=(i,j,l)=>(i*D+j)*D+l;
+  for(let i=0;i<D;i++)for(let j=0;j<D;j++)for(let l=0;l<D;l++){const inside=i>0&&j>0&&l>0&&i<D-1&&j<D-1&&l<D-1;
+    F[id(i,j,l)]=inside?Math.abs(f(k*(i-1)*h,k*(j-1)*h,k*(l-1)*h))-t:1;}
+  const vid=new Int32Array((D-1)*(D-1)*(D-1)).fill(-1),cid=(i,j,l)=>(i*(D-1)+j)*(D-1)+l,pos=[];
+  const E=[[0,1],[2,3],[4,5],[6,7],[0,2],[1,3],[4,6],[5,7],[0,4],[1,5],[2,6],[3,7]];
+  for(let i=0;i<D-1;i++)for(let j=0;j<D-1;j++)for(let l=0;l<D-1;l++){const vals=[],cs=[];
+    for(let q=0;q<8;q++){const a=i+(q&1),b=j+(q>>1&1),cc=l+(q>>2&1);vals.push(F[id(a,b,cc)]);cs.push([a,b,cc]);}
+    let neg=0;for(const v of vals)if(v<0)neg++;if(neg===0||neg===8)continue;
+    let sx=0,sy=0,sz=0,m=0;for(const [a,b] of E){const va=vals[a],vb=vals[b];if((va<0)!==(vb<0)){const u=va/(va-vb);sx+=cs[a][0]+(cs[b][0]-cs[a][0])*u;sy+=cs[a][1]+(cs[b][1]-cs[a][1])*u;sz+=cs[a][2]+(cs[b][2]-cs[a][2])*u;m++;}}
+    vid[cid(i,j,l)]=pos.length/3;pos.push(clamp((sx/m-1)*h,0,H),clamp((sy/m-1)*h,0,H),clamp((sz/m-1)*h,0,H));}
+  const idx=[],quad=(a,b,c2,d,flip)=>{if(a<0||b<0||c2<0||d<0)return;if(flip)idx.push(a,c2,b,a,d,c2);else idx.push(a,b,c2,a,c2,d);};
+  for(let i=1;i<D-1;i++)for(let j=1;j<D-1;j++)for(let l=1;l<D-1;l++){const v0=F[id(i,j,l)];
+    if(i<D-1){const v1=F[id(i+1,j,l)];if((v0<0)!==(v1<0))quad(vid[cid(i,j-1,l-1)],vid[cid(i,j,l-1)],vid[cid(i,j,l)],vid[cid(i,j-1,l)],!(v0<0));}
+    if(j<D-1){const v1=F[id(i,j+1,l)];if((v0<0)!==(v1<0))quad(vid[cid(i-1,j,l-1)],vid[cid(i-1,j,l)],vid[cid(i,j,l)],vid[cid(i,j,l-1)],!(v0<0));}
+    if(l<D-1){const v1=F[id(i,j,l+1)];if((v0<0)!==(v1<0))quad(vid[cid(i-1,j-1,l)],vid[cid(i,j-1,l)],vid[cid(i,j,l)],vid[cid(i-1,j,l)],!(v0<0));}}
+  const g=new THREE.BufferGeometry(),P=new Float32Array(pos),uv=new Float32Array(pos.length/3*2);for(let q=0;q<pos.length/3;q++){uv[2*q]=(P[3*q]+P[3*q+2])*9;uv[2*q+1]=P[3*q+1]*9;}
+  g.setAttribute('position',new THREE.BufferAttribute(P,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(pos.length),3));g.setIndex(idx);g.computeVertexNormals();
+  g.userData.base=P.slice();return g;}
+
+RIG.lattice={hist:[0,0],histF:[0,0],types:['octet','gyroid'],items:[{x:-0.3},{x:0.3}],view:{dir:[0.5,0.42,1.25],lift:-0.02},legend:['Strain (relative)','low','high'],
+  bet:null,streak:0,
   sigma(){const u=+$('l-P').value;return LAT.smax*u*u;},
-  model(){const rel=+$('l-r').value,s=this.sigma(),Eo=rel/3*LAT.Es,Eb=rel*rel*LAT.Es,so=Math.min(rel/3*LAT.ss,0.2*rel*rel*LAT.Es),sb=0.3*Math.pow(rel,1.5)*LAT.ss;
-    const o={E:Eo,sf:so,buck:0.2*rel*rel*LAT.Es<rel/3*LAT.ss},b={E:Eb,sf:sb};
-    o.pl=s>so?clamp((s-so)/(0.05*so),0,1):0;o.fr=s>1.03*so?clamp((s-1.03*so)/(0.12*so),0,1):0;
-    b.pl=s>sb?clamp((s-sb)/(0.1*sb),0,1):0;b.fr=s>1.1*sb?clamp((s-1.1*sb)/(0.15*sb),0,1):0;
-    [o,b].forEach((x,i)=>{this.hist[i]=Math.max(this.hist[i],x.pl);this.histF[i]=Math.max(this.histF[i],x.fr);x.pH=this.hist[i];x.fH=this.histF[i];x.e=Math.min(1,s/x.sf);x.eps=Math.min(s,x.sf)/x.E;});
-    return {rel,s,S:[o,b]};},
-  build(){clearRig();if(!HAS3D)return;const H=LAT.c*LAT.n;bedPlate(1.25,.6,0,0);
-    for(const it of this.items){Object.assign(it,latticeNodesStruts(it.type));const g=new THREE.Group();g.position.x=it.x;rig.add(g);it.g=g;
+  model(){const rel=+$('l-r').value,s=this.sigma();
+    const S=this.types.map((ty,i)=>{const T=LTYPES[ty],E=T.E(rel)*LAT.Es,sf=T.S(rel)*LAT.ss,x={type:ty,T,E,sf,buck:ty==='octet'&&0.2*rel*rel*LAT.Es<rel/3*LAT.ss};
+      if(T.mode==='snap'){const k=ty==='bcc'?0.1:0.05;x.pl=s>sf?clamp((s-sf)/(k*sf),0,1):0;x.fr=s>(1+k*.6)*sf?clamp((s-(1+k*.6)*sf)/(0.13*sf),0,1):0;}
+      else{x.pl=s>sf?clamp((s-sf)/(0.08*sf),0,1):0;x.fr=s>1.08*sf?clamp((s-1.08*sf)/(0.6*sf),0,1):0;}   // fr = progress of the crush plateau
+      this.hist[i]=Math.max(this.hist[i],x.pl);this.histF[i]=Math.max(this.histF[i],x.fr);x.pH=this.hist[i];x.fH=this.histF[i];x.e=Math.min(1,s/sf);x.eps=Math.min(s,sf)/E;return x;});
+    return {rel,s,S};},
+  build(){clearRig();if(!HAS3D)return;const H=LAT.c*LAT.n,rel=+$('l-r').value;bedPlate(1.25,.6,0,0);
+    this.items.forEach((it,ii)=>{it.type=this.types[ii];it.T=LTYPES[it.type];it.name=it.T.name;const g=new THREE.Group();g.position.x=it.x;rig.add(g);it.g=g;
       box(.42,.05,.42,M.chrome,0,.065,0,g);it.top=box(.42,.05,.42,M.chrome,0,0,0,g);const yTop=.09+H+.3;
       for(const sx of [-1,1]){cyl(.022,yTop,M.chrome,sx*.25,yTop/2+.04,-.16,g,20);}box(.6,.09,.12,M.paint,0,yTop,-.12,g);box(.16,.09,.22,M.paint,0,yTop,-.02,g);
-      cyl(.06,.14,M.paint,0,yTop-.115,0,g);it.ramTop=yTop-.19;it.ram=cyl(.026,1,M.chrome,0,0,0,g);
-      if(it.type==='octet'){const tg=new THREE.CylinderGeometry(1,1,1,10,1);it.inst=[new THREE.InstancedMesh(tg,M.ti,it.struts.length*2)];}
-      else it.inst=[new THREE.InstancedMesh(new THREE.TubeGeometry(new SCurve(0),14,1,8,false),M.ti,it.struts.length*2)];
-      for(const im of it.inst){im.frustumCulled=false;im.castShadow=true;im.receiveShadow=true;im.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(im.count*3),3);track(im,M.ti);g.add(im);}
-      it.tF=tag('','force',true);it.tSup=tag('rigid platens','sup',true);it.tSec=tag('','sec',true);it.tState=tag('');}
+      cyl(.06,.14,M.paint,0,yTop-.115,0,g);it.ramTop=yTop-.19;it.ram=cyl(.026,1,M.chrome,0,0,0,g);it.inst=null;it.sheet=null;
+      if(it.T.kind==='strut'){Object.assign(it,latticeNodesStruts(it.type));
+        const tg=it.type==='octet'?new THREE.CylinderGeometry(1,1,1,10,1):new THREE.TubeGeometry(new SCurve(0),14,1,8,false);
+        const im=new THREE.InstancedMesh(tg,M.ti,it.struts.length*2);im.frustumCulled=false;im.castShadow=true;im.receiveShadow=true;im.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(im.count*3),3);track(im,M.ti);g.add(im);it.inst=im;}
+      else{const sg=tpmsGeometry(it.type,rel);it.sheet=track(mesh(sg,M.ti),M.ti);it.sheet.position.set(-H/2,.09,-H/2);g.add(it.sheet);}
+      it.tF=tag('','force',true);it.tSup=tag('rigid platens','sup',true);it.tSec=tag('','sec',true);it.tState=tag('');it.tName=tag('<b>'+(ii?'B':'A')+'</b> '+it.name,'sec');});
     this.update();},
-  update(){const m=this.model();this.S=m.S;const {rel,s}=m,[o,b]=m.S;
+  update(){const m=this.model();this.S=m.S;const {rel,s}=m,[A,B]=m.S;
     $('o-lr').textContent=fmt(rel,3);$('o-lP').textContent=sig(s,2)+' MPa';
-    $('l-res').innerHTML=`<span class="big">${fmt(o.E/b.E,1)}× <span>stiffer</span></span><small>and ${fmt(o.sf/b.sf,1)}× stronger · octet vs open, same density</small>`;
-    EQ('eq-l1').innerHTML=`octet cell: b = 36, j = 14 → <b>M = 0</b> (rigid: struts stretch) · open cell: b = 8, j = 9 → <b>M = −13</b> (struts bend)`;
-    EQ('eq-l2').innerHTML=`E = ⅓ × ${fmt(rel,3)} × 115 GPa = <b>${sig(o.E/1000)} GPa</b> · σ = <b>${sig(o.sf)} MPa</b>${o.buck?' (struts buckle first, Eq 13.29)':''}`;
-    EQ('eq-l3').innerHTML=`E = ${fmt(rel,3)}² × 115 GPa = <b>${sig(b.E/1000)} GPa</b> · σ<sub>pl</sub> = <b>${sig(b.sf)} MPa</b>`;
-    if(!HAS3D||!this.items[0].inst)return;const c=LAT.c,H=c*LAT.n,mtx=new THREE.Matrix4(),up=new THREE.Vector3(0,1,0),white=new THREE.Color(1,1,1),zero=new THREE.Matrix4().makeScale(0,0,0);
-    this.items.forEach((it,ii)=>{const st=m.S[ii],oct=it.type==='octet',x0=-H/2,z0=-H/2,y0=.09;
-      const epsD=LAT.X*st.eps;let r=oct?(c/Math.SQRT2)*Math.sqrt(rel/(6*Math.SQRT2*Math.PI)):c*Math.sqrt(rel/(4*Math.sqrt(3)*Math.PI));
-      // both lattices: uniform squash, then the block above a 45-degree plane slides down once struts across it snap
-      const slide=.6*c*smooth(st.fH>0?Math.max(st.fH,.15):st.pH*.12),side=p=>-(p[0]-H/2)+(p[1]-H/2)>1e-6;
-      const nodeP=p=>{let x=p[0],y=p[1]*(1-epsD);if(side(p)){x-=slide/Math.SQRT2;y-=slide/Math.SQRT2;}return new THREE.Vector3(x0+x,y0+y,z0+p[2]);};
-      const im=it.inst[0],broken=st.fH>.25;let n=0;
-      if(!oct){const lb=c*Math.sqrt(3)/2,amp=0.9*epsD*lb+st.pH*0.22*lb;im.geometry.dispose();const g=new THREE.TubeGeometry(new SCurve(amp),14,r,8,false);
-        const col=new Float32Array(g.attributes.position.count*3);for(let i=0;i<g.attributes.position.count;i++){const u=Math.floor(i/9)/14;let v=strainOn?Math.min(1.2,(.25+.75*st.e)*Math.pow(Math.abs(1-2*u),1.5)):0;if(strainOn&&st.pH>0)v=Math.max(v,Math.pow(Math.abs(1-2*u),3)*(1+st.pH*.3));const cc=cmap(v);col[3*i]=cc.r;col[3*i+1]=cc.g;col[3*i+2]=cc.b;}
-        g.setAttribute('color',new THREE.BufferAttribute(col,3));im.geometry=g;}
-      const hot=new THREE.Color(1,.35,.3);
-      const put=(p,qq,v)=>{const d=qq.clone().sub(p),len=d.length(),yv=d.clone().normalize();let xv=up.clone().sub(yv.clone().multiplyScalar(up.dot(yv)));if(xv.lengthSq()<1e-8)xv.set(1,0,0);xv.normalize();const zv=new THREE.Vector3().crossVectors(xv,yv);
-        if(oct)mtx.makeBasis(xv.multiplyScalar(r),yv.multiplyScalar(len),zv.multiplyScalar(r));else mtx.makeBasis(xv,yv.multiplyScalar(len),zv);
-        mtx.setPosition(p.clone().add(qq).multiplyScalar(.5));im.setMatrixAt(n,mtx);im.setColorAt(n,!strainOn?white:oct?cmap(v):(v>1?hot:white));n++;};
-      for(const [a,bb] of it.struts){const A=it.nodes[a],B=it.nodes[bb],p=nodeP(A),qq=nodeP(B),d=qq.clone().sub(p),cos2=(d.y/d.length())**2;const cross=side(A)!==side(B);
-        let v=st.e*.85*cos2;if(cross&&st.pH>0)v=Math.max(v,.95+.2*st.fH);
-        if(cross&&broken){put(p,p.clone().lerp(qq,.4),1.1);put(qq,qq.clone().lerp(p,.4),1.1);}else put(p,qq,v);}
-      while(n<im.count){im.setMatrixAt(n,zero);n++;}im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true;
-      im.material=strainOn?(oct?M.strainInst:M.strain):M.ti;
-      let topY=0;for(const p of it.nodes)topY=Math.max(topY,nodeP(p).y);it.top.position.y=topY+.025;const rb=topY+.05,len=Math.max(.02,it.ramTop-rb);it.ram.scale.y=len;it.ram.position.y=rb+len/2;
-      const X=it.x;it.tF.pos.set(X+.15,topY+.09,.2);it.tF.el.textContent='σ = F/A = '+sig(s,2)+' MPa';it.tSup.pos.set(X-.15,.04,.24);
-      it.tSec.pos.set(X,.02,.26);it.tSec.el.innerHTML=`<span><b>${it.name}</b>ρ/ρ<sub>s</sub> = ${fmt(rel,3)} · E = ${sig(st.E/1000)} GPa · strut d/c = ${fmt(2*r/c,2)}</span>`;
-      it.tState.pos.set(X,topY+.2,0);const bad=st.pH>0;it.tState.el.className='tag '+(bad?'bad':'ok');it.tState.el.textContent=!bad?'elastic':st.fH>.25?'SHEAR BAND: struts snapped':oct?'YIELDING':'HINGES AT JOINTS';
-      const hn=oct?[1.5*c,1.5*c,3*c]:[1.5*c,1.5*c,2.5*c];it.hot=nodeP(hn).add(new THREE.Vector3(X,0,0));});},
-  pick:['Octet truss','Open lattice'],auto(){const s=this.S;const r=s.map(x=>x.pH>0?2+(x.fH||0):x.e);return r[1]>=r[0]?1:0;},
-  story(i){const s=this.S[i];
-    if(i===0){const steps=['Elastic','Yield','Struts snap'];let st,head,why,sign=-1;
-      if(s.fH>0){st='Struts snap';sign=1;head='Struts snap along a 45° band';why='Printed struts carry bumps of half-melted powder and small pores. Cracks start at these flaws and run across the fine α′ needles. Once a band of struts has broken, the lattice shears along it and the load drops.';}
-      else if(s.pH>0){st='Yield';head='The struts yield in compression';why='Slip starts inside the α′ martensite needles of the printed alloy. Titanium’s hexagonal crystal has few easy slip planes, so the struts harden very little and soon run out of ductility.';}
-      else{st='Elastic';head='Elastic: struts stretch and shorten';why='Triangulated struts cannot rotate without changing length, so they carry the load along their axes. That is why stiffness falls only in proportion to density: E ≈ ⅓(ρ/ρ<sub>s</sub>)E<sub>s</sub>.';}
-      return {mat:'ti',label:'Octet truss',where:'a strut in the middle of the block',sign,e:s.e,pl:s.pH,fr:s.fH,band:0,steps,stage:st,head,why,
-        measure:'<b>Measure it:</b> a compression test. A stretch-dominated lattice shows a high peak stress, then a sharp drop when the shear band forms.'};}
-    const steps=['Elastic','Hinges','Struts snap'];let st,head,why,sign=1;
-    if(s.fH>0){st='Struts snap';head='Struts snap at the joints, along a 45° band';why='As-built printed titanium stretches only a few percent before it breaks. Bending stress peaks at the joints, where the printed surface is also roughest, so cracks start there. Tests on printed Ti-6Al-4V lattices show them breaking along a band at about 45°, and the load drops; there is no long, gentle plateau.';}
-    else if(s.pH>0){st='Hinges';head='Plastic hinges at the joints';why=`Bending is largest at the ends of each strut, where it meets the joint. Dislocations glide in the α′ needles there first, at only ${sig(s.sf)} MPa of applied stress: σ<sub>pl</sub> ≈ 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub>.`;}
-    else{st='Elastic';head='Elastic: struts bend into S-shapes';why='The open lattice has too few struts to be rigid (Maxwell M &lt; 0). The joints rotate and the struts bend, so stiffness falls as (ρ/ρ<sub>s</sub>)². The strain is highest at the strut ends.';}
-    return {mat:'ti',label:'Open lattice',where:'a strut end at a joint',sign,e:s.e,pl:s.pH,fr:s.fH,band:0,steps,stage:st,head,why,
-      measure:'<b>Measure it:</b> a compression test. The bending-dominated lattice yields at a much lower stress; in printed titanium it then breaks along a 45° band, with the load dropping.'};},
-  chartTest(svg,leg){const c=SER(),m=this.model(),[o,b]=m.S,eyb=b.sf/b.E*100,xmax=Math.max(3*eyb,1.6*o.sf/o.E*100);
-    plot(svg,{x:{min:0,max:xmax,label:'Strain ε (%)'},y:{min:0,max:Math.max(o.sf*1.3,m.s*1.1),label:'Stress σ (MPa)'},
-      series:[{pts:[[0,0],[o.sf/o.E*100,o.sf]],c:c.b,w:2.8},{pts:[[o.sf/o.E*100,o.sf],[o.sf/o.E*100*1.15,o.sf*.45],[xmax*1.2,o.sf*.5]],c:c.b,dash:'6 4',w:2},
-        {pts:[[0,0],[eyb,b.sf],[eyb*1.6,b.sf*1.1]],c:c.c,w:2.8},{pts:[[eyb*1.6,b.sf*1.1],[eyb*1.75,b.sf*.5],[xmax*1.2,b.sf*.55]],c:c.c,dash:'6 4',w:2}],
-      hl:[{v:m.s,c:c.cr,dash:'1 0',w:1}],
-      marks:[{x:Math.min(m.s,o.sf)/o.E*100+(o.pH>0?o.sf/o.E*100*.5*o.fH:0),y:m.s,c:c.b},{x:Math.min(m.s,b.sf)/b.E*100*(1+0.6*b.pH)+b.fH*xmax*.4,y:m.s,c:c.c}],
-      texts:[{x:o.sf/o.E*100,y:o.sf,t:'peak, then shear band',dx:8,dy:-6,c:c.b},{x:eyb*1.6,y:b.sf*1.1,t:'hinges, then struts snap',dx:8,dy:-8,c:c.c}]});
-    legend(leg,[{c:c.b,t:'Octet truss (stretch)'},{c:c.c,t:'Open lattice (bend)'},{c:c.mu,t:'after failure',dash:1},{c:c.cr,t:'applied load'}]);},
-  chartDesign(svg,leg){const c=SER(),m=this.model(),[o,b]=m.S;
-    ashbyChart(svg,{solid:[LAT.rs,LAT.Es/1000],solidLabel:'Ti-6Al-4V',lines:[{slope:1,c:c.b,label:'stretch: E ~ ρ',at:.7},{slope:2,c:c.c,label:'bend: E ~ ρ²',at:.85}],
-      points:[{x:m.rel*LAT.rs,y:o.E/1000,c:c.b,label:'octet',dx:-10,anchor:'end'},{x:m.rel*LAT.rs,y:b.E/1000,c:c.c,label:'open',dx:-10,anchor:'end'}]});
-    legend(leg,[{c:c.b,t:'Slope 1: struts stretch',dash:1},{c:c.c,t:'Slope 2: struts bend',dash:1}]);},
+    const hi=A.E>=B.E?0:1,r=hi?B.E/A.E:A.E/B.E;
+    $('l-res').innerHTML=`<span class="big">${fmt(r,1)}× <span>stiffer</span></span><small>${hi?'B':'A'} (${m.S[hi].T.short}) at the same density</small>`;
+    this.updateBet();
+    if(!HAS3D||!this.items[0].g)return;const c=LAT.c,H=c*LAT.n,mtx=new THREE.Matrix4(),up=new THREE.Vector3(0,1,0),white=new THREE.Color(1,1,1),zero=new THREE.Matrix4().makeScale(0,0,0),hot=new THREE.Color(1,.35,.3);
+    this.items.forEach((it,ii)=>{const st=m.S[ii],T=it.T,x0=-H/2,z0=-H/2,y0=.09,epsD=LAT.X*st.eps;let topY;
+      if(T.kind==='strut'){const oct=it.type==='octet',r=oct?(c/Math.SQRT2)*Math.sqrt(rel/(6*Math.SQRT2*Math.PI)):c*Math.sqrt(rel/(4*Math.sqrt(3)*Math.PI));
+        // after the struts snap, the block above the 45 deg plane slides down; the platen follows it and crushes what it meets
+        const slide=.6*c*smooth(st.fH>0?Math.max(st.fH,.15):st.pH*.12),drop=slide/Math.SQRT2,side=p=>-(p[0]-H/2)+(p[1]-H/2)>1e-6;
+        topY=y0+H*(1-epsD)-drop;const ceil=topY;
+        const nodeP=p=>{let x=p[0],y=p[1]*(1-epsD);if(side(p)){x-=slide/Math.SQRT2;y-=drop;}return new THREE.Vector3(x0+x,Math.min(y0+y,ceil),z0+p[2]);};
+        const im=it.inst,broken=st.fH>.25;let n=0;
+        if(!oct){const lb=c*Math.sqrt(3)/2,amp=0.9*epsD*lb+st.pH*0.22*lb;im.geometry.dispose();const g=new THREE.TubeGeometry(new SCurve(amp),14,r,8,false);
+          const col=new Float32Array(g.attributes.position.count*3);for(let i=0;i<g.attributes.position.count;i++){const u=Math.floor(i/9)/14;let v=strainOn?Math.min(1.2,(.25+.75*st.e)*Math.pow(Math.abs(1-2*u),1.5)):0;if(strainOn&&st.pH>0)v=Math.max(v,Math.pow(Math.abs(1-2*u),3)*(1+st.pH*.3));const cc=cmap(v);col[3*i]=cc.r;col[3*i+1]=cc.g;col[3*i+2]=cc.b;}
+          g.setAttribute('color',new THREE.BufferAttribute(col,3));im.geometry=g;}
+        const put=(p,qq,v)=>{const d=qq.clone().sub(p),len=Math.max(1e-4,d.length()),yv=d.clone().normalize();let xv=up.clone().sub(yv.clone().multiplyScalar(up.dot(yv)));if(xv.lengthSq()<1e-8)xv.set(1,0,0);xv.normalize();const zv=new THREE.Vector3().crossVectors(xv,yv);
+          if(oct)mtx.makeBasis(xv.multiplyScalar(r),yv.multiplyScalar(len),zv.multiplyScalar(r));else mtx.makeBasis(xv,yv.multiplyScalar(len),zv);
+          mtx.setPosition(p.clone().add(qq).multiplyScalar(.5));im.setMatrixAt(n,mtx);im.setColorAt(n,!strainOn?white:oct?cmap(v):(v>1?hot:white));n++;};
+        for(const [a,bb] of it.struts){const Aa=it.nodes[a],Bb=it.nodes[bb],p=nodeP(Aa),qq=nodeP(Bb),d=qq.clone().sub(p),dl=Math.max(1e-6,d.length()),cos2=(d.y/dl)**2,cross=side(Aa)!==side(Bb);
+          const crushed=drop>0&&(p.y>=ceil-1e-6||qq.y>=ceil-1e-6)&&!side(Aa)&&!side(Bb);
+          let v=st.e*.85*cos2;if((cross||crushed)&&st.pH>0)v=Math.max(v,.95+.2*st.fH);
+          if(cross&&broken){put(p,p.clone().lerp(qq,.4),1.1);put(qq,qq.clone().lerp(p,.4),1.1);}else put(p,qq,v);}
+        while(n<im.count){im.setMatrixAt(n,zero);n++;}im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true;
+        im.material=strainOn?(oct?M.strainInst:M.strain):M.ti;
+        const hn=oct?[1.5*c,1.5*c,3*c]:[1.5*c,1.5*c,2.5*c];it.hot=nodeP(hn).add(new THREE.Vector3(it.x,0,0));}
+      else{ // sheet TPMS: uniform elastic squash, then one layer crushes at a time (plateau), with a slight bulge in that layer
+        const g=it.sheet.geometry,P=g.attributes.position,B0=g.userData.base,C=g.attributes.color,crush=0.5*c*smooth(st.fH)+0.06*c*st.pH,yb=H*.62,w=c*.5;
+        for(let q=0;q<P.count;q++){const x=B0[3*q],y=B0[3*q+1],z=B0[3*q+2];let Y=y*(1-epsD),X=x,Z=z,inBand=0;
+          if(crush>0){const d=y-(yb-w/2);if(d>w)Y-=crush;else if(d>0){const f=d/w;Y-=crush*f;inBand=1-Math.abs(2*f-1);const bulge=crush*.35*inBand;X=H/2+(x-H/2)*(1+bulge/H*2);Z=H/2+(z-H/2)*(1+bulge/H*2);}}
+          P.array[3*q]=X;P.array[3*q+1]=Y;P.array[3*q+2]=Z;
+          const v=strainOn?Math.max(st.e*.7,inBand*(.9+.3*st.pH)):0,cc=cmap(v);C.array[3*q]=cc.r;C.array[3*q+1]=cc.g;C.array[3*q+2]=cc.b;}
+        P.needsUpdate=true;C.needsUpdate=true;g.computeVertexNormals();g.computeBoundingSphere();
+        topY=y0+H*(1-epsD)-crush;it.hot=new THREE.Vector3(it.x,y0+(yb-w/2)*(1-epsD)+w/2,z0+H);}
+      it.top.position.y=topY+.025;const rb=topY+.05,len=Math.max(.02,it.ramTop-rb);it.ram.scale.y=len;it.ram.position.y=rb+len/2;
+      const X=it.x;it.tF.pos.set(X+.15,topY+.09,.2);it.tF.el.textContent='σ = '+sig(s,2)+' MPa';it.tSup.pos.set(X-.15,.04,.24);
+      it.tSec.pos.set(X,.02,.26);it.tSec.el.innerHTML=`<span><b>${it.name}</b>E = ${sig(st.E/1000)} GPa · σ<sub>f</sub> = ${sig(st.sf)} MPa</span>`;
+      it.tName.pos.set(X,.09+H+.42,0);
+      it.tState.pos.set(X,topY+.2,0);const bad=st.pH>0;it.tState.el.className='tag '+(bad?'bad':'ok');
+      it.tState.el.textContent=!bad?'elastic':T.mode==='plateau'?(st.fH>.05?'crushing layer by layer':'yielding'):st.fH>.25?'struts snapped':it.type==='octet'?'yielding':'hinges at joints';});},
+  /* ---- the bet: which one holds more? ---- */
+  setBet(i){this.bet=i;document.querySelectorAll('#l-bet button[data-b]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.b===i));this.betDone=false;this.updateBet();},
+  updateBet(){const el=$('l-bet-res');if(!el||!this.S)return;const [A,B]=this.S,win=A.sf>=B.sf?0:1,first=Math.min(A.sf,B.sf),s=this.sigma();
+    if(this.bet==null){el.textContent='';el.className='';return;}
+    if(s<first){el.textContent='Press ▶ to test';el.className='';return;}
+    const right=this.bet===win,ratio=Math.max(A.sf,B.sf)/Math.min(A.sf,B.sf);
+    if(!this.betDone){this.betDone=true;this.streak=right?this.streak+1:0;try{localStorage.setItem('shape-lab-streak',this.streak);}catch(e){}}
+    el.className=right?'win':'lose';el.innerHTML=`${right?'✓ Right':'✗ Not this time'}: ${win?'B':'A'} holds ${fmt(ratio,1)}× more <span>streak ${this.streak}</span>`;},
+  randomPair(){const k=Object.keys(LTYPES);let a=k[Math.floor(Math.random()*4)],b=a;while(b===a)b=k[Math.floor(Math.random()*4)];this.types=[a,b];
+    const r=$('l-r');r.value=(0.05+Math.round(Math.random()*25)*0.01).toFixed(3);$('l-P').value=0;syncLatticeSeg();clearHist(this);this.bet=null;this.betDone=false;
+    document.querySelectorAll('#l-bet button[data-b]').forEach(b=>b.setAttribute('aria-pressed',false));this.build();},
+  pick:['A','B'],auto(){const s=this.S;const r=s.map(x=>x.pH>0?2+(x.fH||0):x.e);return r[1]>=r[0]?1:0;},
+  story(i){const s=this.S[i],T=s.T,lab=T.name;
+    if(T.mode==='plateau'){const steps=['Elastic','Yield','Layer crush'];let st,head,why;
+      if(s.fH>0){st='Layer crush';head='One layer crushes, then the next';why='The curved sheets fold one layer of cells at a time while the stress stays nearly flat. Energy is soaked up without a sudden snap: this is why sheet TPMS are used for implants and crash absorbers.';}
+      else if(s.pH>0){st='Yield';head='The sheet yields over a wide area';why='A smooth, continuously curved sheet has no sharp joints, so strain spreads out instead of piling up at nodes. Slip starts in many α′ needles at once.';}
+      else{st='Elastic';head='Curved sheets stretch and bend together';why=`The sheets are partly stretched, partly bent, so stiffness falls as ρ̄<sup>${T.slope}</sup>: between a stretching truss (ρ̄¹) and a bending lattice (ρ̄²).`;}
+      return {mat:'ti',label:lab,where:'the middle layer',sign:-1,e:s.e,pl:s.pH,fr:0,band:0,steps,stage:st,head,why,
+        measure:'<b>Measure it:</b> a compression test shows a smooth rise, a long plateau and then a steep wall when the layers are fully packed.'};}
+    if(s.type==='octet'){const steps=['Elastic','Yield','Struts snap'];let st,head,why,sign=-1;
+      if(s.fH>0){st='Struts snap';sign=1;head='Struts snap along a 45° band';why='Cracks start at half-melted powder bumps and pores on the printed struts. Once a band of struts has broken, the block above it slides down and the load drops.';}
+      else if(s.pH>0){st='Yield';head='The struts yield in compression';why='Slip starts inside the α′ needles of the printed alloy. Titanium has few easy slip planes, so the struts soon run out of ductility.';}
+      else{st='Elastic';head='Struts stretch and shorten';why='Triangulated struts cannot rotate without changing length, so they carry the load along their axes: E ≈ ⅓ρ̄E<sub>s</sub>.';}
+      return {mat:'ti',label:lab,where:'a strut in the middle',sign,e:s.e,pl:s.pH,fr:s.fH,band:0,steps,stage:st,head,why,measure:'<b>Measure it:</b> a high peak stress, then a sharp drop when the band forms.'};}
+    const steps=['Elastic','Hinges','Struts snap'];let st,head,why;
+    if(s.fH>0){st='Struts snap';head='Struts snap at the joints';why='Bending stress peaks at the joints, where the printed surface is roughest, so cracks start there and run along a 45° band.';}
+    else if(s.pH>0){st='Hinges';head='Plastic hinges at the joints';why=`Bending is largest where each strut meets a joint; slip starts there at only ${sig(s.sf)} MPa of applied stress.`;}
+    else{st='Elastic';head='Struts bend into S-shapes';why='Too few struts to be rigid (Maxwell M &lt; 0): the joints rotate and the struts bend, so E falls as ρ̄².';}
+    return {mat:'ti',label:lab,where:'a strut end at a joint',sign:1,e:s.e,pl:s.pH,fr:s.fH,band:0,steps,stage:st,head,why,measure:'<b>Measure it:</b> it yields at a much lower stress, then breaks along a 45° band.'};},
+  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.b,c.c],ser=[],marks=[];let xmax=0;
+    m.S.forEach(s=>{xmax=Math.max(xmax,(s.T.mode==='plateau'?4:2)*s.sf/s.E*100);});
+    m.S.forEach((s,i)=>{const ey=s.sf/s.E*100;
+      if(s.T.mode==='plateau'){ser.push({pts:[[0,0],[ey,s.sf],[ey*1.4,s.sf*1.05],[xmax*.8,s.sf*1.12]],c:cols[i],w:2.8},{pts:[[xmax*.8,s.sf*1.12],[xmax*1.2,s.sf*1.6]],c:cols[i],dash:'6 4',w:2});}
+      else{ser.push({pts:[[0,0],[ey,s.sf]],c:cols[i],w:2.8},{pts:[[ey,s.sf],[ey*1.12,s.sf*.45],[xmax*1.2,s.sf*.5]],c:cols[i],dash:'6 4',w:2});}
+      marks.push({x:Math.min(m.s,s.sf)/s.E*100*(1+(s.T.mode==='plateau'?2*s.fH:.5*s.fH)),y:Math.min(m.s,s.T.mode==='plateau'?s.sf*1.1:s.sf),c:cols[i]});});
+    plot(svg,{x:{min:0,max:xmax,label:'Strain ε (%)'},y:{min:0,max:Math.max(...m.S.map(s=>s.sf))*1.35,label:'Stress σ (MPa)'},series:ser,hl:[{v:m.s,c:c.cr,dash:'1 0',w:1}],marks});
+    legend(leg,[{c:c.b,t:'A · '+m.S[0].T.name},{c:c.c,t:'B · '+m.S[1].T.name},{c:c.mu,t:'after failure',dash:1}]);},
+  chartDesign(svg,leg){const c=SER(),m=this.model(),cols=[c.b,c.c];
+    ashbyChart(svg,{solid:[LAT.rs,LAT.Es/1000],solidLabel:'Ti-6Al-4V',lines:[{slope:1,c:c.mu,label:'stretch: E ~ ρ',at:.7},{slope:2,c:c.mu,label:'bend: E ~ ρ²',at:.85}],
+      points:m.S.map((s,i)=>({x:m.rel*LAT.rs,y:s.E/1000,c:cols[i],label:(i?'B ':'A ')+s.T.short,dx:-10,anchor:'end'}))});
+    legend(leg,[{c:c.b,t:'A'},{c:c.c,t:'B'},{c:c.mu,t:'Slopes 1 and 2',dash:1}]);},
 };
+function syncLatticeSeg(){['A','B'].forEach((k,i)=>document.querySelectorAll(`#l-${k} button`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===RIG.lattice.types[i])));}
+try{RIG.lattice.streak=+(localStorage.getItem('shape-lab-streak')||0)||0;}catch(e){}
 
 /* =========================== 5. CORRUGATION =========================== */
 // Galvanized S280GD sheet cantilevers 0.7 m x 0.3 m, t = 2 mm. phi_e = (2a+t)^2/t^2 (Eq. 12.8), phi_f = (2a+t)/t (Eq. 12.9), ideal.
@@ -2437,6 +2514,12 @@ function show(id){stopPlay();cur=id;microPick=null;tabBtns.forEach(b=>b.setAttri
   RIG[id].build();RIG[id].update();resetView();setLegend();renderMicro();renderChart();MIC.snap();
   try{history.replaceState(null,'','#'+id);}catch(e){}}
 tabBtns.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+/* lattice: pick A and B, bet, random pair */
+['A','B'].forEach((k,i)=>$('l-'+k).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const Rg=RIG.lattice;Rg.types[i]=b.dataset.t;syncLatticeSeg();clearHist(Rg);Rg.bet=null;Rg.betDone=false;
+  document.querySelectorAll('#l-bet button[data-b]').forEach(x=>x.setAttribute('aria-pressed',false));if(cur==='lattice'){Rg.build();refresh();MIC.snap();}}));
+$('l-bet').addEventListener('click',e=>{const b=e.target.closest('button[data-b]');if(!b)return;RIG.lattice.setBet(+b.dataset.b);});
+$('l-rand').addEventListener('click',()=>{stopPlay();RIG.lattice.randomPair();refresh();MIC.snap();});
+syncLatticeSeg();
 
 /* sliders: geometry sliders make a new specimen and rebuild; load sliders only update */
 const GEOM={'c-L':'column','w-k':'wall','m-r':'cells','l-r':'lattice','s-a':'sheet'};

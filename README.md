@@ -9,7 +9,7 @@ Interactive 3D test rigs for **ES 192: Materials Selection in Mechanical Design*
 | 1 | Columns | [#column](https://seymurhh.github.io/es192-shape-lab/#column) | Steel tube vs solid bar of the same mass in a press: the bar bows and buckles first |
 | 2 | Thin walls | [#wall](https://seymurhh.github.io/es192-shape-lab/#wall) | Aluminium tube, same area, thinner and wider: stronger until the wall kinks |
 | 3 | Cells | [#cells](https://seymurhh.github.io/es192-shape-lab/#cells) | Solid bar, tube and cellular beam of the same mass; hexagon, square, triangle or foam cells |
-| 4 | Lattices | [#lattice](https://seymurhh.github.io/es192-shape-lab/#lattice) | Printed titanium lattices: stretch-dominated octet truss vs bending-dominated open lattice |
+| 4 | Lattices | [#lattice](https://seymurhh.github.io/es192-shape-lab/#lattice) | Printed titanium lattices side by side: octet truss, open (BCC) lattice, gyroid and diamond TPMS sheets. Bet on which holds more, or press **Random pair** |
 | 5 | Corrugation | [#sheet](https://seymurhh.github.io/es192-shape-lab/#sheet) | Flat vs corrugated steel sheet |
 
 Each tab has a microscope strip (grains and atoms) that follows the load: elastic stretch, slip, kinking and fracture.
@@ -42,4 +42,4 @@ Tests (headless Chrome): `cd tests && npm install && npm test`.
 
 ## Sources
 
-Ashby, *Materials Selection in Mechanical Design*, 6th ed. (Elsevier, 2025): Eqs 11.3, 11.14, 11.15a, 11.38, 12.8–12.9, 13.3, 13.18, 13.20, 13.27–13.29. Column imperfections: EN 1993-1-1 §6.3.1. Wood strengths: USDA Wood Handbook (Sitka spruce). Full list in the page's **Sources** panel.
+Ashby, *Materials Selection in Mechanical Design*, 6th ed. (Elsevier, 2025): Eqs 11.3, 11.14, 11.15a, 11.38, 12.8–12.9, 13.3, 13.18, 13.20, 13.27–13.29. Column imperfections: EN 1993-1-1 §6.3.1. Wood strengths: USDA Wood Handbook (Sitka spruce). Gyroid and diamond TPMS: Naghavi et al., *Bioengineering* 9 (2022) 504, Table 7 (L-PBF Ti-6Al-4V). Full list in the page's **Sources** panel.

@@ -120,6 +120,13 @@ input[type=range]{width:100%;accent-color:var(--crimson);margin:4px 0}
 .eq .v{grid-column:1/-1;font:400 .78rem var(--f-mono);color:var(--muted)}
 .eq .v b{color:var(--fg);font-weight:500}
 
+.bet{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.78rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.bet button{font:600 .9rem var(--f-body);min-width:40px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:5px;cursor:pointer;letter-spacing:0;text-transform:none}
+.bet button[aria-pressed="true"]{background:var(--crimson);border-color:var(--crimson);color:#fff}
+.bet .rnd{margin-left:auto;font-weight:500;font-size:.8rem}
+#l-bet-res{flex-basis:100%;font:600 .95rem var(--f-body);letter-spacing:0;text-transform:none;color:var(--fg);min-height:1.3em}
+#l-bet-res.win{color:var(--good)} #l-bet-res.lose{color:var(--crimson)}
+#l-bet-res span{font:500 .78rem var(--f-mono);color:var(--muted);margin-left:8px}
 /* ---------- chart panel ---------- */
 .chartp{display:flex;flex-direction:column;padding:10px 12px 8px;gap:6px}
 .ph{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
@@ -278,10 +285,13 @@ body.present svg text{font-size:13.5px}
     <div class="result" data-panel="cells" id="m-res"></div>
 
     <!-- 4 lattice -->
-    <div class="app-card" data-panel="lattice"><span class="t">Two 3D-printed Ti-6Al-4V lattices, same density</span></div>
-    <p class="q" data-panel="lattice">Same struts, same density. Why is one far stiffer?</p>
-    <div class="ctl" data-panel="lattice"><label for="l-r"><span>Relative density <span class="sym">ρ/ρ<sub>s</sub></span></span> <output id="o-lr"></output></label><input id="l-r" type="range" min="0.03" max="0.3" step="0.005" value="0.1"></div>
-    <div class="ctl" data-panel="lattice"><label for="l-P"><span>Applied stress <span class="sym">σ</span></span> <output id="o-lP"></output></label><div class="row"><input id="l-P" type="range" min="0" max="1" step="0.001" value="0.25"><button class="play" type="button" data-for="l-P" aria-label="Play load">▶</button></div></div>
+    <div class="app-card" data-panel="lattice"><span class="t">3D-printed Ti-6Al-4V lattices, same density</span></div>
+    <p class="q" data-panel="lattice">Same mass of titanium. Which lattice holds more?</p>
+    <div class="ctl" data-panel="lattice"><label><span>A</span></label><div class="seg" id="l-A" role="group" aria-label="Lattice A"><button type="button" data-t="octet" aria-pressed="false">Octet</button><button type="button" data-t="bcc" aria-pressed="false">Open</button><button type="button" data-t="gyroid" aria-pressed="false">Gyroid</button><button type="button" data-t="diamond" aria-pressed="false">Diamond</button></div></div>
+    <div class="ctl" data-panel="lattice"><label><span>B</span></label><div class="seg" id="l-B" role="group" aria-label="Lattice B"><button type="button" data-t="octet" aria-pressed="false">Octet</button><button type="button" data-t="bcc" aria-pressed="false">Open</button><button type="button" data-t="gyroid" aria-pressed="false">Gyroid</button><button type="button" data-t="diamond" aria-pressed="false">Diamond</button></div></div>
+    <div class="ctl" data-panel="lattice"><label for="l-r"><span>Relative density <span class="sym">ρ/ρ<sub>s</sub></span></span> <output id="o-lr"></output></label><input id="l-r" type="range" min="0.05" max="0.45" step="0.005" value="0.15"></div>
+    <div class="bet" id="l-bet" data-panel="lattice"><span>Your bet</span><button type="button" data-b="0" aria-pressed="false">A</button><button type="button" data-b="1" aria-pressed="false">B</button><button type="button" class="rnd" id="l-rand">Random pair</button><div id="l-bet-res"></div></div>
+    <div class="ctl" data-panel="lattice"><label for="l-P"><span>Applied stress <span class="sym">σ</span></span> <output id="o-lP"></output></label><div class="row"><input id="l-P" type="range" min="0" max="1" step="0.001" value="0.2"><button class="play" type="button" data-for="l-P" aria-label="Play load">▶</button></div></div>
     <div class="result" data-panel="lattice" id="l-res"></div>
 
     <!-- 5 sheet -->
@@ -322,9 +332,10 @@ body.present svg text{font-size:13.5px}
     <ul><li>Aligned cells ψ = ρ<sub>s</sub>/ρ (Eq 11.38, p.406). Foam E = (ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.18, p.470) and σ<sub>pl</sub> = 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub> (Eq 13.20, p.471). Aligned-cell strength σ = (ρ/ρ<sub>s</sub>)σ<sub>s</sub>.</li>
     <li>Cell-wall solid ≈ 1500 kg/m³, 35 GPa, read from the cellulose bubble on Fig 13.34. Loads are given as a fraction of F₀, the load that breaks the solid bar. Wood crushes along the grain at about 39 MPa but breaks in bending at about 70 MPa (Sitka spruce, 12% moisture, USDA Wood Handbook), so the squeezed face creases at 0.55 of the breaking load; the beam then softens and breaks on the stretched face. The foam's walls yield in compression, so its collapse starts at 0.3 × 0.55 = 0.17 F₀.</li></ul>
     <h4>Lattices</h4>
-    <ul><li>Octet truss (Fig 13.21): Maxwell M ≥ 0 (Eq 13.3, p.453), E ≈ ⅓(ρ/ρ<sub>s</sub>)E<sub>s</sub> (Eq 13.27, p.473), collapse σ ≈ ⅓(ρ/ρ<sub>s</sub>)σ<sub>s</sub> (Eq 13.28, p.474) or strut buckling 0.2(ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.29), whichever is lower.</li>
-    <li>Open (body-centred) lattice: M &lt; 0, E ≈ (ρ/ρ<sub>s</sub>)²E<sub>s</sub>, σ<sub>pl</sub> ≈ 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub>. Ti-6Al-4V as printed: E<sub>s</sub> = 115 GPa, σ<sub>s</sub> ≈ 1000 MPa (typical laser powder-bed values).</li>
-    <li>As printed, Ti-6Al-4V stretches only a few percent before it breaks, so compression tests on printed lattices end with struts snapping along a band at about 45° and the load dropping, not with a long collapse plateau. Both lattices fail that way here; the open lattice first forms plastic hinges at its joints.</li>
+    <ul><li>Octet truss (Fig 13.21): Maxwell M ≥ 0 (Eq 13.3, p.453), E ≈ ⅓(ρ/ρ<sub>s</sub>)E<sub>s</sub> (Eq 13.27, p.473), collapse σ ≈ ⅓(ρ/ρ<sub>s</sub>)σ<sub>s</sub> (Eq 13.28) or strut buckling 0.2(ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.29), whichever is lower.</li>
+    <li>Open (body-centred) lattice: M &lt; 0, E ≈ (ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.18), σ<sub>pl</sub> ≈ 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub> (Eq 13.20).</li>
+    <li>Sheet gyroid and sheet diamond TPMS: E/E<sub>s</sub> = 0.90(ρ/ρ<sub>s</sub>)<sup>1.58</sup> and 0.713(ρ/ρ<sub>s</sub>)<sup>1.21</sup>; σ/σ<sub>s</sub> = 0.536(ρ/ρ<sub>s</sub>)<sup>1.45</sup> and 0.419(ρ/ρ<sub>s</sub>)<sup>1.14</sup>. Fits to laser powder-bed Ti-6Al-4V scaffolds at ρ/ρ<sub>s</sub> 0.33–0.47 (Naghavi et al., <i>Bioengineering</i> 9 (2022) 504, Table 7); below 0.33 they are extrapolated. Surfaces: gyroid sin x cos y + sin y cos z + sin z cos x; diamond (Schwarz D). The sheet is the region |f| &lt; t, with t set so the solid fraction equals ρ/ρ<sub>s</sub>.</li>
+    <li>E<sub>s</sub> = 115 GPa, σ<sub>s</sub> ≈ 1000 MPa (as printed). As-built Ti-6Al-4V has little ductility, so strut lattices end with struts snapping along a 45° band and the load dropping; the block above the band slides down and the platen follows it. Sheet TPMS instead yield, then crush layer by layer along a long plateau (Naghavi et al. 2022).</li>
     <li>Squash in the 3D view is drawn 8× larger than the elastic strain; the ratio between the two lattices is true.</li></ul>
     <h4>Corrugation</h4>
     <ul><li>φ<sub>e</sub> = (2a+t)²/t² and φ<sub>f</sub> = (2a+t)/t (Eqs 12.8–12.9, p.436) are ideal values for a section through the wave peaks; real gains are a little lower, and deep corrugations can also buckle locally at the crest. S280GD galvanized sheet, σ<sub>y</sub> = 280 MPa. The surface first yields at M<sub>y</sub> = σ<sub>y</sub>Z; the sheet folds when the full plastic moment forms, 1.5 M<sub>y</sub> for a flat strip, falling towards 1.27 M<sub>y</sub> for a deep wave.</li></ul>

@@ -31,6 +31,12 @@ function show(id){stopPlay();cur=id;microPick=null;tabBtns.forEach(b=>b.setAttri
   RIG[id].build();RIG[id].update();resetView();setLegend();renderMicro();renderChart();MIC.snap();
   try{history.replaceState(null,'','#'+id);}catch(e){}}
 tabBtns.forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+/* lattice: pick A and B, bet, random pair */
+['A','B'].forEach((k,i)=>$('l-'+k).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const Rg=RIG.lattice;Rg.types[i]=b.dataset.t;syncLatticeSeg();clearHist(Rg);Rg.bet=null;Rg.betDone=false;
+  document.querySelectorAll('#l-bet button[data-b]').forEach(x=>x.setAttribute('aria-pressed',false));if(cur==='lattice'){Rg.build();refresh();MIC.snap();}}));
+$('l-bet').addEventListener('click',e=>{const b=e.target.closest('button[data-b]');if(!b)return;RIG.lattice.setBet(+b.dataset.b);});
+$('l-rand').addEventListener('click',()=>{stopPlay();RIG.lattice.randomPair();refresh();MIC.snap();});
+syncLatticeSeg();
 
 /* sliders: geometry sliders make a new specimen and rebuild; load sliders only update */
 const GEOM={'c-L':'column','w-k':'wall','m-r':'cells','l-r':'lattice','s-a':'sheet'};
