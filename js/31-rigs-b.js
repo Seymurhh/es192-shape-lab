@@ -243,7 +243,7 @@ RIG.lattice={hist:[0,0],histF:[0,0],types:['octet','gyroid'],items:[{x:-0.3},{x:
         const nodeP=p=>{let x=p[0],y=p[1]*(1-epsD);if(side(p)){x-=slide/Math.SQRT2;y-=drop;}return new THREE.Vector3(x0+x,Math.min(y0+y,ceil),z0+p[2]);};
         const im=it.inst,broken=st.fH>.25;let n=0;
         if(!oct){const lb=c*Math.sqrt(3)/2,amp=0.9*epsD*lb+st.pH*0.22*lb;im.geometry.dispose();const g=new THREE.TubeGeometry(new SCurve(amp),14,r,8,false);
-          const col=new Float32Array(g.attributes.position.count*3);for(let i=0;i<g.attributes.position.count;i++){const u=Math.floor(i/9)/14;let v=strainOn?Math.min(1.2,(.25+.75*st.e)*Math.pow(Math.abs(1-2*u),1.5)):0;if(strainOn&&st.pH>0)v=Math.max(v,Math.pow(Math.abs(1-2*u),3)*(1+st.pH*.3));const cc=cmap(v);col[3*i]=cc.r;col[3*i+1]=cc.g;col[3*i+2]=cc.b;}
+          const col=new Float32Array(g.attributes.position.count*3);for(let i=0;i<g.attributes.position.count;i++){const u=Math.floor(i/9)/14;let v=strainOn?Math.min(1.2,st.e*Math.pow(Math.abs(1-2*u),1.5)):0;/* bending strain: zero at zero load, largest at the joints */if(strainOn&&st.pH>0)v=Math.max(v,Math.pow(Math.abs(1-2*u),3)*(1+st.pH*.3));const cc=cmap(v);col[3*i]=cc.r;col[3*i+1]=cc.g;col[3*i+2]=cc.b;}
           g.setAttribute('color',new THREE.BufferAttribute(col,3));im.geometry=g;}
         const put=(p,qq,v)=>{const d=qq.clone().sub(p),len=Math.max(1e-4,d.length()),yv=d.clone().normalize();let xv=up.clone().sub(yv.clone().multiplyScalar(up.dot(yv)));if(xv.lengthSq()<1e-8)xv.set(1,0,0);xv.normalize();const zv=new THREE.Vector3().crossVectors(xv,yv);
           if(oct)mtx.makeBasis(xv.multiplyScalar(r),yv.multiplyScalar(len),zv.multiplyScalar(r));else mtx.makeBasis(xv,yv.multiplyScalar(len),zv);
