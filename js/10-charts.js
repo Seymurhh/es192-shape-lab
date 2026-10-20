@@ -3,7 +3,7 @@ function niceTicks(lo,hi,n=5){const span=hi-lo||1;const s0=span/n,mag=Math.pow(1
 function logTicks(lo,hi){const t=[];const a=Math.floor(Math.log10(lo)),b=Math.ceil(Math.log10(hi));const few=b-a<=2;for(let e=a;e<=b;e++)for(const m of few?[1,2,5]:[1]){const v=m*Math.pow(10,e);if(v>=lo*0.999&&v<=hi*1.001)t.push(v);}return t;}
 const tickLabel=v=>{const a=Math.abs(v);if(a>=1e4)return sig(v,2);if(a>=1)return fmt(v,Number.isInteger(+v.toFixed(6))?0:1);if(a===0)return '0';return String(+v.toPrecision(2));};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-/* cfg: x/y {min,max,log,label,unit}, series [{pts,c,w,dash,op,label}], hl/vl [{v,c,dash,label,pos}], marks [{x,y,c,r,label,dx,dy,anchor}],
+/* cfg: x/y {min,max,log,label,unit}, series [{pts,c,w,dash,op,label}], hl/vl [{v,c,dash,label,pos}], marks [{x,y,c,r,label,dx,dy,anchor}], fails [{x,y,c,label}],
    under(sc) -> svg string drawn under the series, texts [{x,y,t,c,anchor,dx,dy,cls}] */
 function plot(svg,cfg){
   const W=Math.max(200,svg.clientWidth||svg.parentNode.clientWidth||400), H=Math.max(140,svg.clientHeight||svg.parentNode.clientHeight||240);
@@ -36,12 +36,20 @@ function plot(svg,cfg){
     const x=isH?(L.pos==='left'?X0+6:X1-6):sx(L.v)+5, y=isH?sy(L.v)-5:Y1+13;
     h+=`<text x="${x}" y="${y}" text-anchor="${isH&&L.pos!=='left'?'end':'start'}" style="fill:${L.c||mu}" paint-order="stroke" stroke="${bg}" stroke-width="3">${L.label}</text>`;}
   for(const t of cfg.texts||[])h+=`<text x="${sx(t.x)+(t.dx||0)}" y="${sy(t.y)+(t.dy||0)}" text-anchor="${t.anchor||'start'}" style="fill:${t.c||mu}" class="${t.cls||''}" paint-order="stroke" stroke="${bg}" stroke-width="3">${t.t}</text>`;
+  /* fails [{x,y,c,label}]: where each specimen fails. A ring on the curve, a dotted drop line to the x axis, and the
+     deflection written at its foot; labels that would collide stack upwards. Off the right edge: an arrow label. */
+  {const rows=[];for(const f of (cfg.fails||[]).slice().sort((a,b)=>a.x-b.x)){const x=sx(f.x),y=clamp(sy(f.y),Y1,Y0);if(!isFinite(x))continue;
+    const off=x>X1,tw=(f.label.length*6.6)+8,xl=off?X1-4:x+4,anc=off||x+tw>X1?'end':'start',x0=anc==='end'?(off?xl-tw:x-4-tw):xl;let r=0;
+    while(rows.some(q=>q.r===r&&q.x0<x0+tw&&x0<q.x0+q.tw))r++;rows.push({r,x0,tw});
+    const ty=Y0-7-r*15,lx=off?xl:anc==='end'?x-4:xl;
+    if(!off)h+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${Y0}" stroke="${f.c}" stroke-width="1.3" stroke-dasharray="2 3"/><circle cx="${x}" cy="${y}" r="5.5" fill="${bg}" stroke="${f.c}" stroke-width="2.2"/>`;
+    h+=`<text x="${lx}" y="${ty}" text-anchor="${anc}" style="fill:${f.c};font-weight:600" paint-order="stroke" stroke="${bg}" stroke-width="3">${off?f.label+' →':f.label}</text>`;}}
   for(const p of cfg.marks||[]){const x=sx(p.x),y=sy(p.y);if(!isFinite(x)||!isFinite(y))continue;const cx=clamp(x,X0,X1),cy=clamp(y,Y1,Y0);
     h+=p.sq?`<rect x="${cx-5}" y="${cy-5}" width="10" height="10" fill="${p.c}"/>`:`<circle cx="${cx}" cy="${cy}" r="${p.r||6.5}" fill="${p.c}" stroke="${bg}" stroke-width="2"/>`;
     if(p.label)h+=`<text x="${cx+(p.dx==null?10:p.dx)}" y="${cy+(p.dy==null?4:p.dy)}" text-anchor="${p.anchor||'start'}" style="fill:${p.tc||p.c};font-weight:600" paint-order="stroke" stroke="${bg}" stroke-width="3">${p.label}</text>`;}
   svg.innerHTML=h;return sc;
 }
-function legend(el,items){el.innerHTML=items.map(i=>`<span><i style="background:${i.c};${i.dash?`background:repeating-linear-gradient(90deg,${i.c} 0 5px,transparent 5px 8px)`:''}"></i>${i.t}</span>`).join('');}
+function legend(el,items){el.innerHTML=items.map(i=>i.ring?`<span>${i.t}</span>`:`<span><i style="background:${i.c};${i.dash?`background:repeating-linear-gradient(90deg,${i.c} 0 5px,transparent 5px 8px)`:''}"></i>${i.t}</span>`).join('');}
 
 /* ---------- Ashby modulus–density chart (envelopes after Ashby Fig. 3.3) ---------- */
 const FAM=[ // name, rho min-max (kg/m3), E min-max (GPa), colour

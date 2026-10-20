@@ -10,19 +10,35 @@
 //   foam (Eq. 13.20, sigma_pl = 0.3 rel^3/2 sigma_s): collapse starts at 0.3 x 0.55 F0 = 0.17 F0 at any density.
 // Break shapes: wood fails like a green stick: the stretched (top) face splinters and opens while the squeezed fibres hold, so
 // the free part hinges about its bottom edge. A wrinkled tube or a foam crushes on the squeezed face and hinges about its top edge.
-const CEL={L:0.8,b0:0.04,drop:0.12,Es:35,rs:1500,cr:38.7/70.3,sc:38.7,zh:0.12,y0:.64};
+const CEL={L:0.8,b0:0.04,drop:0.12,Es:35,rs:1500,cr:38.7/70.3,sc:38.7,sb:70.3,zh:0.12,y0:.64};
+// The 3D view draws the solid bar's tip drop at F0 as 0.12 m so it can be seen. The chart uses the true elastic value,
+// sigma_b L^2 / (3 E_s c) = 70.3 x 0.8^2 / (3 x 35 000 x 0.02) = 21 mm, so its millimetres are real; dmm converts.
+CEL.dmm=CEL.sb*CEL.L**2/(3*CEL.Es*1000*CEL.b0/2)/CEL.drop;
 const CELL_KINDS={hex:'Hexagons',sq:'Squares',tri:'Triangles',foam:'Foam'};
+/* Cell holes, drawn so the solid fraction of the section equals rel exactly (v8: v7 skipped edge cells and drew about
+   twice the stated material at rel 0.25). Cells tile the whole section; holes are clipped to a skin one wall thick;
+   the hole scale k is found by bisection on the drawn area. */
+const polyArea=p=>{let a=0;for(let i=0;i<p.length;i++){const q=p[i],r=p[(i+1)%p.length];a+=q[0]*r[1]-r[0]*q[1];}return Math.abs(a)/2;};
+function clipBox(p,h){for(const [ax,sg] of [[0,1],[0,-1],[1,1],[1,-1]]){const o=[];for(let i=0;i<p.length;i++){const A=p[i],B=p[(i+1)%p.length],a=sg*A[ax],c=sg*B[ax];
+    if(a<=h)o.push(A);if((a<=h)!==(c<=h)){const t=(h-a)/(c-a);o.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t]);}}p=o;if(p.length<3)return [];}return p;}
+function cellHoles(kind,b,rel){const n=Math.max(4,Math.round(b/0.016)),cells=[];let wall;   // cells: [centre, vertices]; wall(k) = wall thickness
+  if(kind==='sq'){const p=b/n;for(let i=0;i<n;i++)for(let j=0;j<n;j++){const cx=-b/2+(i+.5)*p,cy=-b/2+(j+.5)*p,s=p/2;cells.push([[cx,cy],[[cx-s,cy-s],[cx+s,cy-s],[cx+s,cy+s],[cx-s,cy+s]]]);}wall=k=>p*(1-k)/2;}
+  else if(kind==='tri'){const p=b/n*1.15,h=p*Math.sqrt(3)/2,R=Math.ceil(b/h/2)+1,C=Math.ceil(b/p)+2;
+    for(let r=-R;r<R;r++)for(let c=-2*C;c<=2*C;c++){const up=((c+r)%2+2)%2===0,x0=c*p/2,yb=r*h;
+      const t=up?[[x0,yb],[x0+p,yb],[x0+p/2,yb+h]]:[[x0,yb+h],[x0+p,yb+h],[x0+p/2,yb]];cells.push([[(t[0][0]+t[1][0]+t[2][0])/3,(t[0][1]+t[1][1]+t[2][1])/3],t]);}
+    wall=k=>2*(h/3)*(1-k);}
+  else{const Rc=b/(n*Math.sqrt(3)),N=Math.ceil(b/(1.5*Rc)/2)+1,M=Math.ceil(b/(Math.sqrt(3)*Rc)/2)+1;
+    for(let row=-N;row<=N;row++)for(let c=-M;c<=M;c++){const cx=c*Math.sqrt(3)*Rc+(row&1?Math.sqrt(3)*Rc/2:0),cy=row*1.5*Rc;
+      cells.push([[cx,cy],[0,1,2,3,4,5].map(i=>{const a=Math.PI/6+i*Math.PI/3;return [cx+Rc*Math.cos(a),cy+Rc*Math.sin(a)];})]);}
+    wall=k=>Math.sqrt(3)*Rc*(1-k);}
+  const holes=k=>{const lim=b/2-wall(k),out=[];for(const [g,v] of cells){const full=polyArea(v)*k*k,q=clipBox(v.map(z=>[g[0]+(z[0]-g[0])*k,g[1]+(z[1]-g[1])*k]),lim);
+      if(q.length>=3&&polyArea(q)>0.04*full)out.push(q);}return out;};
+  const solid=k=>1-holes(k).reduce((s,q)=>s+polyArea(q),0)/(b*b);
+  let lo=0.05,hi=0.999;for(let i=0;i<34;i++){const m=(lo+hi)/2;if(solid(m)>rel)lo=m;else hi=m;}
+  const hs=holes((lo+hi)/2);hs.solid=solid((lo+hi)/2);return hs;}
 function cellShape(kind,b,rel){
   const sh=new THREE.Shape();sh.moveTo(-b/2,-b/2);sh.lineTo(b/2,-b/2);sh.lineTo(b/2,b/2);sh.lineTo(-b/2,b/2);sh.closePath();
-  const n=Math.max(4,Math.round(b/0.016)),k=Math.sqrt(Math.max(0.02,1-rel)),poly=pts=>{const h=new THREE.Path();pts.forEach((p,i)=>i?h.lineTo(p[0],p[1]):h.moveTo(p[0],p[1]));h.closePath();sh.holes.push(h);};
-  if(kind==='sq'){const p=b/n,s=p*k/2;for(let i=0;i<n;i++)for(let j=0;j<n;j++){const cx=-b/2+(i+.5)*p,cy=-b/2+(j+.5)*p;poly([[cx-s,cy-s],[cx+s,cy-s],[cx+s,cy+s],[cx-s,cy+s]]);}}
-  else if(kind==='tri'){const p=b/n*1.15,h=p*Math.sqrt(3)/2,rows=Math.floor(b/h),y0=-rows*h/2,m=(1-k)*p*.18;
-    for(let r=0;r<rows;r++)for(let c=-2;c<2*n+2;c++){const up=(c+r)%2===0,x0=-b/2+c*p/2,yb=y0+r*h;
-      const tri=up?[[x0,yb],[x0+p,yb],[x0+p/2,yb+h]]:[[x0,yb+h],[x0+p,yb+h],[x0+p/2,yb]];const g=[(tri[0][0]+tri[1][0]+tri[2][0])/3,(tri[0][1]+tri[1][1]+tri[2][1])/3];
-      const sm=tri.map(q=>[g[0]+(q[0]-g[0])*k,g[1]+(q[1]-g[1])*k]);if(sm.every(q=>Math.abs(q[0])<b/2-m&&Math.abs(q[1])<b/2-m))poly(up?sm:sm.reverse());}}
-  else{const Rc=b/(n*Math.sqrt(3)),Rh=Rc*k,lim=b/2-(Rc-Rh)*0.9;
-    for(let row=-n*2;row<=n*2;row++)for(let c=-n*2;c<=n*2;c++){const cx=c*Math.sqrt(3)*Rc+(row&1?Math.sqrt(3)*Rc/2:0),cy=row*1.5*Rc;
-      if(Math.abs(cx)+Rh*0.87>lim||Math.abs(cy)+Rh>lim)continue;poly([0,1,2,3,4,5].map(i=>{const a=Math.PI/6+i*Math.PI/3;return [cx+Rh*Math.cos(a),cy+Rh*Math.sin(a)];}));}}
+  for(const q of cellHoles(kind,b,rel)){const h=new THREE.Path();q.forEach((p,i)=>i?h.lineTo(p[0],p[1]):h.moveTo(p[0],p[1]));h.closePath();sh.holes.push(h);}
   return sh;}
 function tubeShape(b,t){const sh=new THREE.Shape();sh.moveTo(-b/2,-b/2);sh.lineTo(b/2,-b/2);sh.lineTo(b/2,b/2);sh.lineTo(-b/2,b/2);sh.closePath();
   const h=new THREE.Path(),c=b/2-t;h.moveTo(-c,-c);h.lineTo(-c,c);h.lineTo(c,c);h.lineTo(c,-c);h.closePath();sh.holes.push(h);return sh;}
@@ -127,15 +143,15 @@ RIG.cells={hist:[0,0,0],histF:[0,0,0],mtype:'hex',items:[{name:'Solid bar'},{nam
     else{st='Elastic';head=i===0?'The solid bar bends':i===1?'The tube bends':'Walls along the beam stretch';why=i===0?'All the material is packed close to the centre line, where bending does little.':i===1?'All the walls sit at the outside, where bending strain is largest.':'Every wall runs along the beam, whatever the cell shape, so the walls stretch like the solid does. E falls only as ρ/ρ<sub>s</sub> while I grows much faster.';}
     return {mat:i===2?'wood':'wooddense',label:this.items[i].name,where,sign,e:s.e,pl:s.pH,fr:s.fH,band:0,steps,stage:st,head,why,
       measure:'<b>Measure it:</b> a three-point bending test. A wrinkle appears on the squeezed face before the stretched face breaks.'};},
-  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b,c.c],ser=[],marks=[];
-    m.S.forEach((s,i)=>{const k=CEL.drop*1000/s.psi,dC=s.Pc*k;
-      if(s.mode==='foam'){ser.push({pts:[[0,0],[dC,s.Pc]],c:cols[i],w:2.8});ser.push({pts:[[dC,s.Pc],[1e4,s.Pc*1.08]],c:cols[i],dash:'6 4',w:2});}
-      else{const sl=s.mode==='wood'?1.7:0.4,dB=dC+sl*(s.Pb-s.Pc)*k,pts=[[0,0],[dC,s.Pc]];for(let j=1;j<=12;j++){const f=j/12;pts.push([dC+(dB-dC)*f,s.Pc+(s.Pb-s.Pc)*Math.sqrt(f)]);}
-        ser.push({pts,c:cols[i],w:2.8});ser.push({pts:[[dB,s.Pb],[dB*1.08,s.Pb*.3],[1e4,s.Pb*.25]],c:cols[i],dash:'6 4',w:2});}
-      marks.push({x:s.drop*1000+Math.sin(s.rot)*CEL.L*1000,y:m.P,c:cols[i]});});
+  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b,c.c],ser=[],marks=[],fails=[],f=CEL.dmm;
+    m.S.forEach((s,i)=>{const k=CEL.drop*1000*f/s.psi,dC=s.Pc*k;
+      if(s.mode==='foam'){ser.push({pts:[[0,0],[dC,s.Pc]],c:cols[i],w:2.8});ser.push({pts:[[dC,s.Pc],[1e4,s.Pc*1.08]],c:cols[i],dash:'6 4',w:2});fails.push({x:dC,y:s.Pc,c:cols[i],label:sig(dC,2)+' mm'});}
+      else{const sl=s.mode==='wood'?1.7:0.4,dB=dC+sl*(s.Pb-s.Pc)*k,pts=[[0,0],[dC,s.Pc]];for(let j=1;j<=12;j++){const q=j/12;pts.push([dC+(dB-dC)*q,s.Pc+(s.Pb-s.Pc)*Math.sqrt(q)]);}
+        ser.push({pts,c:cols[i],w:2.8});ser.push({pts:[[dB,s.Pb],[dB*1.08,s.Pb*.3],[1e4,s.Pb*.25]],c:cols[i],dash:'6 4',w:2});fails.push({x:dB,y:s.Pb,c:cols[i],label:sig(dB,2)+' mm'});}
+      marks.push({x:(s.drop*1000+Math.sin(s.rot)*CEL.L*1000)*f,y:m.P,c:cols[i]});});
     const ymax=Math.max(1.25,Math.min(5.2,Math.max(...m.S.map(s=>s.Pb))*1.12),m.P*1.08);
-    plot(svg,{x:{min:0,max:Math.max(200,1.15*CEL.drop*1000*(CEL.cr+1.7*(1-CEL.cr))),label:'Tip deflection δ (mm)'},y:{min:0,max:ymax,label:'Tip load F / F₀'},series:ser,marks,hl:[{v:m.P,c:c.cr,dash:'1 0',w:1}]});
-    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.c,t:CELL_KINDS[m.kind]},{c:c.mu,t:'after failure',dash:1}]);},
+    plot(svg,{x:{min:0,max:f*Math.max(200,1.15*CEL.drop*1000*(CEL.cr+1.7*(1-CEL.cr))),label:'Tip deflection δ (mm)'},y:{min:0,max:ymax,label:'Tip load F / F₀'},series:ser,marks,fails,hl:[{v:m.P,c:c.cr,dash:'1 0',w:1}]});
+    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.c,t:CELL_KINDS[m.kind]},{c:c.mu,t:'after failure',dash:1},{c:c.mu,t:'○ fails at δ',ring:1}]);},
   chartDesign(svg,leg){const c=SER(),m=this.model(),E=m.foam?m.rel*m.rel*CEL.Es:m.rel*CEL.Es;
     ashbyChart(svg,{solid:[CEL.rs,CEL.Es],solidLabel:'cell-wall solid',lines:[{slope:1,c:c.b,label:'aligned cells: E ~ ρ',at:.8},{slope:2,c:c.c,label:'foam: E ~ ρ²',at:.9}],
       points:[{x:m.rel*CEL.rs,y:E,c:m.foam?c.c:c.b,label:sig(E)+' GPa',dx:-10,anchor:'end'}]});
@@ -288,8 +304,9 @@ RIG.lattice={hist:[0,0],histF:[0,0],types:['octet','gyroid'],items:[{x:-0.3},{x:
       if(s.T.mode==='plateau'){ser.push({pts:[[0,0],[ey,s.sf],[ey*1.4,s.sf*1.05],[xmax*.8,s.sf*1.12]],c:cols[i],w:2.8},{pts:[[xmax*.8,s.sf*1.12],[xmax*1.2,s.sf*1.6]],c:cols[i],dash:'6 4',w:2});}
       else{ser.push({pts:[[0,0],[ey,s.sf]],c:cols[i],w:2.8},{pts:[[ey,s.sf],[ey*1.12,s.sf*.45],[xmax*1.2,s.sf*.5]],c:cols[i],dash:'6 4',w:2});}
       marks.push({x:Math.min(m.s,s.sf)/s.E*100*(1+(s.T.mode==='plateau'?2*s.fH:.5*s.fH)),y:Math.min(m.s,s.T.mode==='plateau'?s.sf*1.1:s.sf),c:cols[i]});});
-    plot(svg,{x:{min:0,max:xmax,label:'Strain ε (%)'},y:{min:0,max:Math.max(...m.S.map(s=>s.sf))*1.35,label:'Stress σ (MPa)'},series:ser,hl:[{v:m.s,c:c.cr,dash:'1 0',w:1}],marks});
-    legend(leg,[{c:c.b,t:'A · '+m.S[0].T.name},{c:c.c,t:'B · '+m.S[1].T.name},{c:c.mu,t:'after failure',dash:1}]);},
+    const fails=m.S.map((s,i)=>({x:s.sf/s.E*100,y:s.sf,c:cols[i],label:fmt(s.sf/s.E*100,2)+'%'}));
+    plot(svg,{x:{min:0,max:xmax,label:'Strain ε (%)'},y:{min:0,max:Math.max(...m.S.map(s=>s.sf))*1.35,label:'Stress σ (MPa)'},series:ser,hl:[{v:m.s,c:c.cr,dash:'1 0',w:1}],marks,fails});
+    legend(leg,[{c:c.b,t:'A · '+m.S[0].T.name},{c:c.c,t:'B · '+m.S[1].T.name},{c:c.mu,t:'after failure',dash:1},{c:c.mu,t:'○ fails at ε',ring:1}]);},
   chartDesign(svg,leg){const c=SER(),m=this.model(),cols=[c.b,c.c];
     ashbyChart(svg,{solid:[LAT.rs,LAT.Es/1000],solidLabel:'Ti-6Al-4V',lines:[{slope:1,c:c.mu,label:'stretch: E ~ ρ',at:.7},{slope:2,c:c.mu,label:'bend: E ~ ρ²',at:.85}],
       points:m.S.map((s,i)=>({x:m.rel*LAT.rs,y:s.E/1000,c:cols[i],label:(i?'B ':'A ')+s.T.short,dx:-10,anchor:'end'}))});
@@ -343,13 +360,13 @@ RIG.sheet={hist:[0,0],histY:[0,0],histF:[0,0],items:[{name:'Flat sheet',x:-.2},{
     else{st='Elastic';head='Elastic: top stretches, bottom squeezes';why=i?'The wave moves steel far from the middle of the section, so the same load gives far less strain: φ<sub>f</sub> = (2a + t)/t.':'All of the steel sits within 1 mm of the middle of the section, so it bends easily and the surface strain climbs fast.';}
     return {mat:'galv',label:this.items[i].name,where:'top face, at the clamp',sign:1,e:s.e,pl:0.35*s.yH+0.65*s.pH,fr:s.fH,band:0,steps,stage:st,head,why,
       measure:'<b>Measure it:</b> hang known weights and read the tip drop with a ruler or dial gauge; the slope of load vs drop gives EI.'};},
-  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b],ser=[],marks=[];let xmax=0;
+  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b],ser=[],marks=[],fails=[];let xmax=0;
     m.S.forEach((s,i)=>{const k=SHT.L**3/(3*SHT.E*SHT.I0*s.phe)*1000,pts=[[0,0],[s.Fy*k,s.Fy]];for(let j=1;j<=16;j++){const y=j/16,f=s.Fy+(s.Fp-s.Fy)*y;pts.push([f*k*(1+0.8*y*y),f]);}
-      const end=pts[pts.length-1];xmax=Math.max(xmax,end[0]*1.5);ser.push({pts,c:cols[i],w:2.8},{pts:[end,[1e5,s.Fp*1.03]],c:cols[i],dash:'6 4',w:2});
+      const end=pts[pts.length-1];xmax=Math.max(xmax,end[0]*1.5);ser.push({pts,c:cols[i],w:2.8},{pts:[end,[1e5,s.Fp*1.03]],c:cols[i],dash:'6 4',w:2});fails.push({x:end[0],y:end[1],c:cols[i],label:sig(end[0],2)+' mm'});
       marks.push({x:s.drop*1000+Math.sin(s.rot)*SHT.L*1000,y:m.F,c:cols[i]});});
-    plot(svg,{x:{min:0,max:Math.min(xmax,480),label:'Tip deflection δ (mm)'},y:{min:0,max:Math.max(m.S[1].Fp*1.15,m.F*1.1,160),label:'Tip load F (N)'},series:ser,marks,
+    plot(svg,{x:{min:0,max:Math.min(xmax,480),label:'Tip deflection δ (mm)'},y:{min:0,max:Math.max(m.S[1].Fp*1.15,m.F*1.1,160),label:'Tip load F (N)'},series:ser,marks,fails,
       hl:[{v:m.F,c:c.cr,dash:'1 0',w:1}],texts:[{x:Math.min(xmax,480),y:m.S[0].Fp,t:'flat sheet folds',anchor:'end',dy:-7,c:c.a}]});
-    legend(leg,[{c:c.a,t:'Flat sheet'},{c:c.b,t:'Corrugated'},{c:c.mu,t:'after the fold forms',dash:1},{c:c.cr,t:'applied load'}]);},
+    legend(leg,[{c:c.a,t:'Flat sheet'},{c:c.b,t:'Corrugated'},{c:c.mu,t:'after the fold forms',dash:1},{c:c.mu,t:'○ folds at δ',ring:1},{c:c.cr,t:'applied load'}]);},
   chartDesign(svg,leg){const c=SER(),m=this.model(),pe=[],pf=[];for(let i=0;i<=100;i++){const x=5*i/100;pe.push([x,(2*x+1)**2]);pf.push([x,2*x+1]);}
     plot(svg,{x:{min:0,max:5,label:'Wave amplitude / thickness a/t'},y:{min:1,max:150,log:true,label:'Gain over the flat sheet φ',ticks:[1,2,5,10,20,50,100]},
       series:[{pts:pe,c:c.b,w:2.8},{pts:pf,c:c.c,w:2.8}],vl:[{v:m.at,c:c.mu,dash:'2 3'}],

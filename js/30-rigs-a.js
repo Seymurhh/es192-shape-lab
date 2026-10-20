@@ -19,7 +19,7 @@ function secSVG(kind,o={}){const S='stroke="#1c1b1f" stroke-width="1.2"';
 // S355 steel. EN 10219 tube 60.3 x 2.9 mm vs a solid bar of equal area (25.8 mm). Pinned ends.
 // Starting bow = the EN 1993-1-1 equivalent imperfection e0 = alpha (lambda - 0.2) W/A (curve a, alpha 0.21: hot-finished hollow section;
 // curve c, alpha 0.49: solid section), so first yield by the Ayrton-Perry formula equals the code buckling resistance N_b = chi A f_y.
-const COL={E:210e9,sy:355e6,Fmax:150e3,b0:1/1000,
+const COL={E:210e9,sy:355e6,Fmax:200e3,b0:1/1000,
   items:[{key:'bar',name:'Solid bar',ro:0.0129,ri:0,x:-0.45,side:-1,label:'Ø25.8 mm solid bar',alpha:0.49,curve:'c'},{key:'tube',name:'Tube',ro:0.03015,ri:0.02725,x:0.45,side:1,label:'Ø60.3 × 2.9 mm tube',alpha:0.21,curve:'a'}]};
 COL.items.forEach(it=>{it.A=Math.PI*(it.ro**2-it.ri**2);it.I=Math.PI/4*(it.ro**4-it.ri**4);it.phi=12*it.I/it.A**2;});
 RIG.column={hist:[0,0],items:COL.items,view:{dir:[0.12,0.22,1],lift:0},legend:['Strain / yield strain','0','yield'],
@@ -83,13 +83,14 @@ RIG.column={hist:[0,0],items:COL.items,view:{dir:[0.12,0.22,1],lift:0},legend:['
     return {mat:'steel',label:it.name,where:'mid-height, inner face',sign:-1,e:clamp(s.sface/COL.sy,0,1),pl,fr:0,band:0,steps,stage:st,head,why,
       measure:'<b>Measure it:</b> a strain gauge on each face at mid-height. The difference between them is the bending; the load–deflection curve flattens at first yield.'};},
   chartTest(svg,leg){const c=SER(),L=+$('c-L').value,F=this.F(),S=this.S,xmax=Math.max(40,Math.min(150,L*30));
-    const ser=[],marks=[],hl=[];this.items.forEach((it,i)=>{const s=this.state(it,0,L,0),col=i?c.b:c.a,pts=[];
+    const ser=[],marks=[],hl=[],fails=[];this.items.forEach((it,i)=>{const s=this.state(it,0,L,0),col=i?c.b:c.a,pts=[];
       for(let k=0;k<=80;k++){const f=Math.max(1e3,s.F1*k/80);pts.push([1000*s.e0/(1-f/s.Fc),f/1e3]);}
       ser.push({pts,c:col,w:2.6});ser.push({pts:[[1000*s.e0/(1-s.F1/s.Fc),s.F1/1e3],[xmax*1.2,s.F1*0.86/1e3]],c:col,dash:'6 4',w:2});
       hl.push({v:s.Fc/1e3,c:col,dash:'2 4',label:`F<tspan baseline-shift="sub" font-size="9">c</tspan> ${it.key} ${sig(s.Fc/1e3)} kN`,pos:i?'right':'left'});
+      const dF=1000*s.e0/(1-s.F1/s.Fc);fails.push({x:dF,y:s.F1/1e3,c:col,label:sig(dF,2)+' mm'});
       marks.push({x:1000*S[i].bow,y:Math.max(1,F/1e3),c:col});});
-    plot(svg,{x:{min:0,max:xmax,label:'Sideways bow at mid-height δ (mm)'},y:{min:1,max:300,log:true,label:'Load F (kN), log scale',ticks:[1,2,5,10,20,50,100,200]},series:ser,hl:[...hl,{v:Math.max(1,F/1e3),c:c.cr,dash:'1 0',w:1}],marks});
-    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.mu,t:'after first yield: collapse',dash:1},{c:c.cr,t:'applied load'}]);},
+    plot(svg,{x:{min:0,max:xmax,label:'Sideways bow at mid-height δ (mm)'},y:{min:1,max:300,log:true,label:'Load F (kN), log scale',ticks:[1,2,5,10,20,50,100,200]},series:ser,hl:[...hl,{v:Math.max(1,F/1e3),c:c.cr,dash:'1 0',w:1}],marks,fails});
+    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.mu,t:'after first yield: collapse',dash:1},{c:c.mu,t:'○ collapses at δ',ring:1},{c:c.cr,t:'applied load'}]);},
   chartDesign(svg,leg){const c=SER(),Lnow=+$('c-L').value,F=this.F();const ser=[],marks=[];
     this.items.forEach((it,i)=>{const col=i?c.b:c.a,e=[],cap=[];for(let k=0;k<=100;k++){const L=0.4+2.8*k/100,s=this.state(it,0,L,0);e.push([L,Math.min(600,s.Fc/1e3)]);cap.push([L,s.F1/1e3]);}
       ser.push({pts:e,c:col,dash:'3 4',w:1.6});ser.push({pts:cap,c:col,w:2.8});const s=this.state(it,0,Lnow,0);marks.push({x:Lnow,y:s.F1/1e3,c:col,label:sig(s.F1/1e3)+' kN',dx:10,dy:i?-8:14});});
@@ -172,8 +173,8 @@ RIG.wall={hist:[0],histY:[0],histF:[0],items:[{name:'Tube'}],view:{dir:[0.42,0.3
     const dNow=(m.el+Math.sin(m.c.mode==='yield'?0.38*smooth(m.pH):0.75*smooth(m.pH))*L*.9)*1000;
     const tx=[{x:end[0],y:Fc,t:m.c.mode==='yield'?'plastic hinge: load levels off':'kinks: load drops',dx:8,dy:-8,c:c.b}];if(Fy<Fc)tx.push({x:Fy*k,y:Fy,t:'first yield',dx:8,dy:14,c:c.mu});
     plot(svg,{x:{min:0,max:xmax,label:'Tip deflection δ (mm)'},y:{min:0,max:Math.max(Fc*1.35,m.F*1.1,50),label:'Tip load F (N)'},
-      series:[{pts,c:c.b,w:2.8},{pts:after,c:c.b,dash:'6 4',w:2}],hl:[{v:m.F,c:c.cr,dash:'1 0',w:1}],marks:[{x:dNow,y:m.F,c:c.b}],texts:tx});
-    legend(leg,[{c:c.b,t:'Elastic: δ = FL³/3EI, then yielding'},{c:c.b,t:m.c.mode==='yield'?'after the hinge forms':'after the wall kinks',dash:1},{c:c.cr,t:'applied load'}]);},
+      series:[{pts,c:c.b,w:2.8},{pts:after,c:c.b,dash:'6 4',w:2}],hl:[{v:m.F,c:c.cr,dash:'1 0',w:1}],marks:[{x:dNow,y:m.F,c:c.b}],texts:tx,fails:[{x:end[0],y:end[1],c:c.b,label:sig(end[0],2)+' mm'}]});
+    legend(leg,[{c:c.b,t:'Elastic: δ = FL³/3EI, then yielding'},{c:c.b,t:m.c.mode==='yield'?'after the hinge forms':'after the wall kinks',dash:1},{c:c.mu,t:'○ fails at δ',ring:1},{c:c.cr,t:'applied load'}]);},
   chartDesign(svg,leg){const c=SER(),m=this.S[0],pts=[],py=[],pp=[],pk=[];for(let i=0;i<=120;i++){const k=kOf(i/120),w=wallCap(k);pts.push([k,w.M/WALL.L]);py.push([k,w.My/WALL.L]);pp.push([k,w.Mp/WALL.L]);pk.push([k,Math.min(5000,w.Mk/WALL.L)]);}
     const top=Math.max(...pts.map(p=>p[1]))*1.35;
     plot(svg,{x:{min:5,max:100,log:true,label:'Radius / wall thickness r/t (same metal area)',ticks:[5,10,20,40,100]},y:{min:0,max:top,label:'Tip load it can carry (N)'},

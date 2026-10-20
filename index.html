@@ -182,6 +182,32 @@ svg .t-math{font-family:var(--f-math);font-style:italic;font-size:13px}
 .sheet p,.sheet li{font-size:.86rem;line-height:1.5;max-width:70ch}
 .sheet ul{margin:0;padding-left:18px}
 
+/* ---------- experiments sheet ---------- */
+.sheet .box.wide{max-width:940px}
+#exp-h:focus{outline:none}
+.sheet .lead{color:var(--muted);margin:0 0 6px}
+.exp{border-top:1px solid var(--line);padding:14px 0 12px}
+.exp header{display:flex;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
+.exp .tk{flex-basis:100%;font:600 .7rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--crimson)}
+.sheet .exp h4{margin:0;font:600 1.3rem/1.15 var(--f-display);letter-spacing:.01em;text-transform:none;color:var(--fg)}
+.exp .go{margin-left:auto;background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.sheet .exp .ask{font-size:.95rem;font-weight:500;margin:6px 0 4px;max-width:none}
+.exp .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:4px 22px}
+.exp h5{margin:6px 0 2px;font:600 .68rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.exp ol,.exp ul{margin:0;padding-left:18px}
+.sheet .exp li{font-size:.84rem;line-height:1.45}
+.exp details{margin-top:10px;background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:7px 12px}
+.exp summary{cursor:pointer;font-weight:600;font-size:.86rem}
+.exp details[open] summary{margin-bottom:4px}
+.sheet .exp details p{max-width:none;margin:6px 0}
+.exp .note{color:var(--muted);font-size:.78rem}
+.exp table{border-collapse:collapse;font-size:.82rem;margin:6px 0 8px;font-variant-numeric:tabular-nums}
+.exp th,.exp td{padding:4px 14px 4px 0;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.exp th{font-weight:600}
+.exp.then{margin-left:6px;padding-left:16px;border-top:0;border-left:3px solid var(--line);padding-top:4px}
+.exp.then h4{font-size:1.1rem}
+@media (max-width:640px){.exp .cols{grid-template-columns:minmax(0,1fr)}.exp table{display:block;overflow-x:auto}}
+
 /* ---------- presenter + narrow ---------- */
 body.present{--fs:16px}
 body.present .q{font-size:1.9rem}
@@ -227,6 +253,7 @@ body.present svg text{font-size:13.5px}
     <button role="tab" aria-selected="false" data-tab="sheet"><kbd>5</kbd>Corrugation</button>
   </nav>
   <div class="acts">
+    <button class="ib" type="button" id="b-exp">Experiments<kbd>E</kbd></button>
     <button class="ib" type="button" id="b-src">Sources</button>
     <button class="ib" type="button" id="b-theme" aria-label="Switch light or dark">Theme</button>
     <button class="ib" type="button" id="b-present" aria-pressed="false">Present<kbd>P</kbd></button>
@@ -282,7 +309,7 @@ body.present svg text{font-size:13.5px}
     <div class="app-card" data-panel="wall"><span class="t">Aluminium 6061-T6 tube, clamped at one end</span></div>
     <p class="q" data-panel="wall">Thinner wall, same metal. Stronger forever?</p>
     <div class="ctl" data-panel="wall"><label for="w-k"><span>Radius / wall thickness <span class="sym">r/t</span></span> <output id="o-wk"></output></label><input id="w-k" type="range" min="0" max="1" step="0.001" value="0.2"></div>
-    <div class="ctl" data-panel="wall"><label for="w-F"><span>Tip load <span class="sym">F</span></span> <output id="o-wF"></output></label><div class="row"><input id="w-F" type="range" min="0" max="1200" step="5" value="300"><button class="play" type="button" data-for="w-F" aria-label="Play load">▶</button></div></div>
+    <div class="ctl" data-panel="wall"><label for="w-F"><span>Tip load <span class="sym">F</span></span> <output id="o-wF"></output></label><div class="row"><input id="w-F" type="range" min="0" max="1600" step="5" value="300"><button class="play" type="button" data-for="w-F" aria-label="Play load">▶</button></div></div>
     <div class="result" data-panel="wall" id="w-res"></div>
 
     <!-- 3 cells -->
@@ -339,7 +366,8 @@ body.present svg text{font-size:13.5px}
     <ul><li>Aluminium 6061-T6, E = 69 GPa, σ<sub>y</sub> = 250 MPa, area 150 mm². The surface first yields at M<sub>y</sub> = σ<sub>y</sub>Z; the tube collapses when a full plastic hinge forms at M<sub>p</sub> = (4/π)M<sub>y</sub>, 27% higher (thin tube). The wall kinks at about 0.18 E t/r: the classical elastic value 0.6 E t/r cut by a typical 0.3 knock-down for real-world imperfections. Hinge and kink limits cross at r/t ≈ 39, φ ≈ 37, close to Ashby's φ<sub>max</sub> ≈ 2.3(E/σ<sub>f</sub>)<sup>½</sup> = 38 (Eq 11.15a, p.393).</li></ul>
     <h4>Cells</h4>
     <ul><li>Aligned cells ψ = ρ<sub>s</sub>/ρ (Eq 11.38, p.406). Foam E = (ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.18, p.470) and σ<sub>pl</sub> = 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub> (Eq 13.20, p.471). Aligned-cell strength σ = (ρ/ρ<sub>s</sub>)σ<sub>s</sub>.</li>
-    <li>Cell-wall solid ≈ 1500 kg/m³, 35 GPa, read from the cellulose bubble on Fig 13.34. Loads are given as a fraction of F₀, the load that breaks the solid bar. Wood crushes along the grain at about 39 MPa but breaks in bending at about 70 MPa (Sitka spruce, 12% moisture, USDA Wood Handbook), so the squeezed face creases at 0.55 of the breaking load; the beam then softens and breaks on the stretched face. The foam's walls yield in compression, so its collapse starts at 0.3 × 0.55 = 0.17 F₀.</li></ul>
+    <li>Cell-wall solid ≈ 1500 kg/m³, 35 GPa, read from the cellulose bubble on Fig 13.34. Loads are given as a fraction of F₀, the load that breaks the solid bar. Wood crushes along the grain at about 39 MPa but breaks in bending at about 70 MPa (Sitka spruce, 12% moisture, USDA Wood Handbook), so the squeezed face creases at 0.55 of the breaking load; the beam then softens and breaks on the stretched face. The foam's walls yield in compression, so its collapse starts at 0.3 × 0.55 = 0.17 F₀.</li>
+    <li>Deflections on the test curve are elastic values, δ = <i>FL</i>³/3<i>EI</i>: the solid bar bends 21 mm at F₀ (cell-wall solid, <i>E</i> = 35 GPa). The 3D view draws the bending about 6× larger so it can be seen. Each beam breaks at the same face strain, so the deflection at break scales as 1/<i>c</i>: the two 80 mm beams break at half the deflection of the 40 mm bar. The cell holes are drawn so that the solid fraction of the section equals ρ/ρ<sub>s</sub>.</li></ul>
     <h4>Lattices</h4>
     <ul><li>Octet truss (Fig 13.21): Maxwell M ≥ 0 (Eq 13.3, p.453), E ≈ ⅓(ρ/ρ<sub>s</sub>)E<sub>s</sub> (Eq 13.27, p.473), collapse σ ≈ ⅓(ρ/ρ<sub>s</sub>)σ<sub>s</sub> (Eq 13.28) or strut buckling 0.2(ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.29), whichever is lower.</li>
     <li>Open (body-centred) lattice: M &lt; 0, E ≈ (ρ/ρ<sub>s</sub>)²E<sub>s</sub> (Eq 13.18), σ<sub>pl</sub> ≈ 0.3(ρ/ρ<sub>s</sub>)<sup>3/2</sup>σ<sub>s</sub> (Eq 13.20).</li>
@@ -352,6 +380,15 @@ body.present svg text{font-size:13.5px}
     <ul><li>Grain and atom views are drawings of the mechanisms, not simulations. Strain is exaggerated so it can be seen. Atom views show one slip plane side-on; the real plane sits at about 45° to the load, where the shear stress on it is largest.</li>
     <li>Mechanisms: slip on {110} planes in ferrite and dislocation pinning by carbon (steel); {111} slip and Mg–Si (β″) precipitates in 6061-T6; α′ martensite, partly melted powder and pores in printed Ti-6Al-4V; cellulose chains joined by hydrogen bonds in wood cell walls; zinc-coating cracking on galvanized sheet.</li></ul>
     <p style="margin-top:14px"><button class="ib" type="button" id="b-src-close">Close</button></p>
+  </div>
+</div>
+
+<div class="sheet" id="experiments" hidden role="dialog" aria-modal="true" aria-labelledby="exp-h">
+  <div class="box wide">
+    <h3 id="exp-h" tabindex="-1">Experiments</h3>
+    <p class="lead">Predict, then test. Ask the question, let the class commit to an answer, then press <b>Load setup</b> and ▶. Each setup starts with the load at zero; the answers are folded.</p>
+    <div id="exp-list"></div>
+    <p style="margin-top:14px"><button class="ib" type="button" id="b-exp-close">Close</button></p>
   </div>
 </div>
 
@@ -1617,7 +1654,7 @@ function niceTicks(lo,hi,n=5){const span=hi-lo||1;const s0=span/n,mag=Math.pow(1
 function logTicks(lo,hi){const t=[];const a=Math.floor(Math.log10(lo)),b=Math.ceil(Math.log10(hi));const few=b-a<=2;for(let e=a;e<=b;e++)for(const m of few?[1,2,5]:[1]){const v=m*Math.pow(10,e);if(v>=lo*0.999&&v<=hi*1.001)t.push(v);}return t;}
 const tickLabel=v=>{const a=Math.abs(v);if(a>=1e4)return sig(v,2);if(a>=1)return fmt(v,Number.isInteger(+v.toFixed(6))?0:1);if(a===0)return '0';return String(+v.toPrecision(2));};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-/* cfg: x/y {min,max,log,label,unit}, series [{pts,c,w,dash,op,label}], hl/vl [{v,c,dash,label,pos}], marks [{x,y,c,r,label,dx,dy,anchor}],
+/* cfg: x/y {min,max,log,label,unit}, series [{pts,c,w,dash,op,label}], hl/vl [{v,c,dash,label,pos}], marks [{x,y,c,r,label,dx,dy,anchor}], fails [{x,y,c,label}],
    under(sc) -> svg string drawn under the series, texts [{x,y,t,c,anchor,dx,dy,cls}] */
 function plot(svg,cfg){
   const W=Math.max(200,svg.clientWidth||svg.parentNode.clientWidth||400), H=Math.max(140,svg.clientHeight||svg.parentNode.clientHeight||240);
@@ -1650,12 +1687,20 @@ function plot(svg,cfg){
     const x=isH?(L.pos==='left'?X0+6:X1-6):sx(L.v)+5, y=isH?sy(L.v)-5:Y1+13;
     h+=`<text x="${x}" y="${y}" text-anchor="${isH&&L.pos!=='left'?'end':'start'}" style="fill:${L.c||mu}" paint-order="stroke" stroke="${bg}" stroke-width="3">${L.label}</text>`;}
   for(const t of cfg.texts||[])h+=`<text x="${sx(t.x)+(t.dx||0)}" y="${sy(t.y)+(t.dy||0)}" text-anchor="${t.anchor||'start'}" style="fill:${t.c||mu}" class="${t.cls||''}" paint-order="stroke" stroke="${bg}" stroke-width="3">${t.t}</text>`;
+  /* fails [{x,y,c,label}]: where each specimen fails. A ring on the curve, a dotted drop line to the x axis, and the
+     deflection written at its foot; labels that would collide stack upwards. Off the right edge: an arrow label. */
+  {const rows=[];for(const f of (cfg.fails||[]).slice().sort((a,b)=>a.x-b.x)){const x=sx(f.x),y=clamp(sy(f.y),Y1,Y0);if(!isFinite(x))continue;
+    const off=x>X1,tw=(f.label.length*6.6)+8,xl=off?X1-4:x+4,anc=off||x+tw>X1?'end':'start',x0=anc==='end'?(off?xl-tw:x-4-tw):xl;let r=0;
+    while(rows.some(q=>q.r===r&&q.x0<x0+tw&&x0<q.x0+q.tw))r++;rows.push({r,x0,tw});
+    const ty=Y0-7-r*15,lx=off?xl:anc==='end'?x-4:xl;
+    if(!off)h+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${Y0}" stroke="${f.c}" stroke-width="1.3" stroke-dasharray="2 3"/><circle cx="${x}" cy="${y}" r="5.5" fill="${bg}" stroke="${f.c}" stroke-width="2.2"/>`;
+    h+=`<text x="${lx}" y="${ty}" text-anchor="${anc}" style="fill:${f.c};font-weight:600" paint-order="stroke" stroke="${bg}" stroke-width="3">${off?f.label+' →':f.label}</text>`;}}
   for(const p of cfg.marks||[]){const x=sx(p.x),y=sy(p.y);if(!isFinite(x)||!isFinite(y))continue;const cx=clamp(x,X0,X1),cy=clamp(y,Y1,Y0);
     h+=p.sq?`<rect x="${cx-5}" y="${cy-5}" width="10" height="10" fill="${p.c}"/>`:`<circle cx="${cx}" cy="${cy}" r="${p.r||6.5}" fill="${p.c}" stroke="${bg}" stroke-width="2"/>`;
     if(p.label)h+=`<text x="${cx+(p.dx==null?10:p.dx)}" y="${cy+(p.dy==null?4:p.dy)}" text-anchor="${p.anchor||'start'}" style="fill:${p.tc||p.c};font-weight:600" paint-order="stroke" stroke="${bg}" stroke-width="3">${p.label}</text>`;}
   svg.innerHTML=h;return sc;
 }
-function legend(el,items){el.innerHTML=items.map(i=>`<span><i style="background:${i.c};${i.dash?`background:repeating-linear-gradient(90deg,${i.c} 0 5px,transparent 5px 8px)`:''}"></i>${i.t}</span>`).join('');}
+function legend(el,items){el.innerHTML=items.map(i=>i.ring?`<span>${i.t}</span>`:`<span><i style="background:${i.c};${i.dash?`background:repeating-linear-gradient(90deg,${i.c} 0 5px,transparent 5px 8px)`:''}"></i>${i.t}</span>`).join('');}
 
 /* ---------- Ashby modulus–density chart (envelopes after Ashby Fig. 3.3) ---------- */
 const FAM=[ // name, rho min-max (kg/m3), E min-max (GPa), colour
@@ -1957,7 +2002,7 @@ function secSVG(kind,o={}){const S='stroke="#1c1b1f" stroke-width="1.2"';
 // S355 steel. EN 10219 tube 60.3 x 2.9 mm vs a solid bar of equal area (25.8 mm). Pinned ends.
 // Starting bow = the EN 1993-1-1 equivalent imperfection e0 = alpha (lambda - 0.2) W/A (curve a, alpha 0.21: hot-finished hollow section;
 // curve c, alpha 0.49: solid section), so first yield by the Ayrton-Perry formula equals the code buckling resistance N_b = chi A f_y.
-const COL={E:210e9,sy:355e6,Fmax:150e3,b0:1/1000,
+const COL={E:210e9,sy:355e6,Fmax:200e3,b0:1/1000,
   items:[{key:'bar',name:'Solid bar',ro:0.0129,ri:0,x:-0.45,side:-1,label:'Ø25.8 mm solid bar',alpha:0.49,curve:'c'},{key:'tube',name:'Tube',ro:0.03015,ri:0.02725,x:0.45,side:1,label:'Ø60.3 × 2.9 mm tube',alpha:0.21,curve:'a'}]};
 COL.items.forEach(it=>{it.A=Math.PI*(it.ro**2-it.ri**2);it.I=Math.PI/4*(it.ro**4-it.ri**4);it.phi=12*it.I/it.A**2;});
 RIG.column={hist:[0,0],items:COL.items,view:{dir:[0.12,0.22,1],lift:0},legend:['Strain / yield strain','0','yield'],
@@ -2021,13 +2066,14 @@ RIG.column={hist:[0,0],items:COL.items,view:{dir:[0.12,0.22,1],lift:0},legend:['
     return {mat:'steel',label:it.name,where:'mid-height, inner face',sign:-1,e:clamp(s.sface/COL.sy,0,1),pl,fr:0,band:0,steps,stage:st,head,why,
       measure:'<b>Measure it:</b> a strain gauge on each face at mid-height. The difference between them is the bending; the load–deflection curve flattens at first yield.'};},
   chartTest(svg,leg){const c=SER(),L=+$('c-L').value,F=this.F(),S=this.S,xmax=Math.max(40,Math.min(150,L*30));
-    const ser=[],marks=[],hl=[];this.items.forEach((it,i)=>{const s=this.state(it,0,L,0),col=i?c.b:c.a,pts=[];
+    const ser=[],marks=[],hl=[],fails=[];this.items.forEach((it,i)=>{const s=this.state(it,0,L,0),col=i?c.b:c.a,pts=[];
       for(let k=0;k<=80;k++){const f=Math.max(1e3,s.F1*k/80);pts.push([1000*s.e0/(1-f/s.Fc),f/1e3]);}
       ser.push({pts,c:col,w:2.6});ser.push({pts:[[1000*s.e0/(1-s.F1/s.Fc),s.F1/1e3],[xmax*1.2,s.F1*0.86/1e3]],c:col,dash:'6 4',w:2});
       hl.push({v:s.Fc/1e3,c:col,dash:'2 4',label:`F<tspan baseline-shift="sub" font-size="9">c</tspan> ${it.key} ${sig(s.Fc/1e3)} kN`,pos:i?'right':'left'});
+      const dF=1000*s.e0/(1-s.F1/s.Fc);fails.push({x:dF,y:s.F1/1e3,c:col,label:sig(dF,2)+' mm'});
       marks.push({x:1000*S[i].bow,y:Math.max(1,F/1e3),c:col});});
-    plot(svg,{x:{min:0,max:xmax,label:'Sideways bow at mid-height δ (mm)'},y:{min:1,max:300,log:true,label:'Load F (kN), log scale',ticks:[1,2,5,10,20,50,100,200]},series:ser,hl:[...hl,{v:Math.max(1,F/1e3),c:c.cr,dash:'1 0',w:1}],marks});
-    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.mu,t:'after first yield: collapse',dash:1},{c:c.cr,t:'applied load'}]);},
+    plot(svg,{x:{min:0,max:xmax,label:'Sideways bow at mid-height δ (mm)'},y:{min:1,max:300,log:true,label:'Load F (kN), log scale',ticks:[1,2,5,10,20,50,100,200]},series:ser,hl:[...hl,{v:Math.max(1,F/1e3),c:c.cr,dash:'1 0',w:1}],marks,fails});
+    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.mu,t:'after first yield: collapse',dash:1},{c:c.mu,t:'○ collapses at δ',ring:1},{c:c.cr,t:'applied load'}]);},
   chartDesign(svg,leg){const c=SER(),Lnow=+$('c-L').value,F=this.F();const ser=[],marks=[];
     this.items.forEach((it,i)=>{const col=i?c.b:c.a,e=[],cap=[];for(let k=0;k<=100;k++){const L=0.4+2.8*k/100,s=this.state(it,0,L,0);e.push([L,Math.min(600,s.Fc/1e3)]);cap.push([L,s.F1/1e3]);}
       ser.push({pts:e,c:col,dash:'3 4',w:1.6});ser.push({pts:cap,c:col,w:2.8});const s=this.state(it,0,Lnow,0);marks.push({x:Lnow,y:s.F1/1e3,c:col,label:sig(s.F1/1e3)+' kN',dx:10,dy:i?-8:14});});
@@ -2110,8 +2156,8 @@ RIG.wall={hist:[0],histY:[0],histF:[0],items:[{name:'Tube'}],view:{dir:[0.42,0.3
     const dNow=(m.el+Math.sin(m.c.mode==='yield'?0.38*smooth(m.pH):0.75*smooth(m.pH))*L*.9)*1000;
     const tx=[{x:end[0],y:Fc,t:m.c.mode==='yield'?'plastic hinge: load levels off':'kinks: load drops',dx:8,dy:-8,c:c.b}];if(Fy<Fc)tx.push({x:Fy*k,y:Fy,t:'first yield',dx:8,dy:14,c:c.mu});
     plot(svg,{x:{min:0,max:xmax,label:'Tip deflection δ (mm)'},y:{min:0,max:Math.max(Fc*1.35,m.F*1.1,50),label:'Tip load F (N)'},
-      series:[{pts,c:c.b,w:2.8},{pts:after,c:c.b,dash:'6 4',w:2}],hl:[{v:m.F,c:c.cr,dash:'1 0',w:1}],marks:[{x:dNow,y:m.F,c:c.b}],texts:tx});
-    legend(leg,[{c:c.b,t:'Elastic: δ = FL³/3EI, then yielding'},{c:c.b,t:m.c.mode==='yield'?'after the hinge forms':'after the wall kinks',dash:1},{c:c.cr,t:'applied load'}]);},
+      series:[{pts,c:c.b,w:2.8},{pts:after,c:c.b,dash:'6 4',w:2}],hl:[{v:m.F,c:c.cr,dash:'1 0',w:1}],marks:[{x:dNow,y:m.F,c:c.b}],texts:tx,fails:[{x:end[0],y:end[1],c:c.b,label:sig(end[0],2)+' mm'}]});
+    legend(leg,[{c:c.b,t:'Elastic: δ = FL³/3EI, then yielding'},{c:c.b,t:m.c.mode==='yield'?'after the hinge forms':'after the wall kinks',dash:1},{c:c.mu,t:'○ fails at δ',ring:1},{c:c.cr,t:'applied load'}]);},
   chartDesign(svg,leg){const c=SER(),m=this.S[0],pts=[],py=[],pp=[],pk=[];for(let i=0;i<=120;i++){const k=kOf(i/120),w=wallCap(k);pts.push([k,w.M/WALL.L]);py.push([k,w.My/WALL.L]);pp.push([k,w.Mp/WALL.L]);pk.push([k,Math.min(5000,w.Mk/WALL.L)]);}
     const top=Math.max(...pts.map(p=>p[1]))*1.35;
     plot(svg,{x:{min:5,max:100,log:true,label:'Radius / wall thickness r/t (same metal area)',ticks:[5,10,20,40,100]},y:{min:0,max:top,label:'Tip load it can carry (N)'},
@@ -2133,19 +2179,35 @@ RIG.wall={hist:[0],histY:[0],histF:[0],items:[{name:'Tube'}],view:{dir:[0.42,0.3
 //   foam (Eq. 13.20, sigma_pl = 0.3 rel^3/2 sigma_s): collapse starts at 0.3 x 0.55 F0 = 0.17 F0 at any density.
 // Break shapes: wood fails like a green stick: the stretched (top) face splinters and opens while the squeezed fibres hold, so
 // the free part hinges about its bottom edge. A wrinkled tube or a foam crushes on the squeezed face and hinges about its top edge.
-const CEL={L:0.8,b0:0.04,drop:0.12,Es:35,rs:1500,cr:38.7/70.3,sc:38.7,zh:0.12,y0:.64};
+const CEL={L:0.8,b0:0.04,drop:0.12,Es:35,rs:1500,cr:38.7/70.3,sc:38.7,sb:70.3,zh:0.12,y0:.64};
+// The 3D view draws the solid bar's tip drop at F0 as 0.12 m so it can be seen. The chart uses the true elastic value,
+// sigma_b L^2 / (3 E_s c) = 70.3 x 0.8^2 / (3 x 35 000 x 0.02) = 21 mm, so its millimetres are real; dmm converts.
+CEL.dmm=CEL.sb*CEL.L**2/(3*CEL.Es*1000*CEL.b0/2)/CEL.drop;
 const CELL_KINDS={hex:'Hexagons',sq:'Squares',tri:'Triangles',foam:'Foam'};
+/* Cell holes, drawn so the solid fraction of the section equals rel exactly (v8: v7 skipped edge cells and drew about
+   twice the stated material at rel 0.25). Cells tile the whole section; holes are clipped to a skin one wall thick;
+   the hole scale k is found by bisection on the drawn area. */
+const polyArea=p=>{let a=0;for(let i=0;i<p.length;i++){const q=p[i],r=p[(i+1)%p.length];a+=q[0]*r[1]-r[0]*q[1];}return Math.abs(a)/2;};
+function clipBox(p,h){for(const [ax,sg] of [[0,1],[0,-1],[1,1],[1,-1]]){const o=[];for(let i=0;i<p.length;i++){const A=p[i],B=p[(i+1)%p.length],a=sg*A[ax],c=sg*B[ax];
+    if(a<=h)o.push(A);if((a<=h)!==(c<=h)){const t=(h-a)/(c-a);o.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t]);}}p=o;if(p.length<3)return [];}return p;}
+function cellHoles(kind,b,rel){const n=Math.max(4,Math.round(b/0.016)),cells=[];let wall;   // cells: [centre, vertices]; wall(k) = wall thickness
+  if(kind==='sq'){const p=b/n;for(let i=0;i<n;i++)for(let j=0;j<n;j++){const cx=-b/2+(i+.5)*p,cy=-b/2+(j+.5)*p,s=p/2;cells.push([[cx,cy],[[cx-s,cy-s],[cx+s,cy-s],[cx+s,cy+s],[cx-s,cy+s]]]);}wall=k=>p*(1-k)/2;}
+  else if(kind==='tri'){const p=b/n*1.15,h=p*Math.sqrt(3)/2,R=Math.ceil(b/h/2)+1,C=Math.ceil(b/p)+2;
+    for(let r=-R;r<R;r++)for(let c=-2*C;c<=2*C;c++){const up=((c+r)%2+2)%2===0,x0=c*p/2,yb=r*h;
+      const t=up?[[x0,yb],[x0+p,yb],[x0+p/2,yb+h]]:[[x0,yb+h],[x0+p,yb+h],[x0+p/2,yb]];cells.push([[(t[0][0]+t[1][0]+t[2][0])/3,(t[0][1]+t[1][1]+t[2][1])/3],t]);}
+    wall=k=>2*(h/3)*(1-k);}
+  else{const Rc=b/(n*Math.sqrt(3)),N=Math.ceil(b/(1.5*Rc)/2)+1,M=Math.ceil(b/(Math.sqrt(3)*Rc)/2)+1;
+    for(let row=-N;row<=N;row++)for(let c=-M;c<=M;c++){const cx=c*Math.sqrt(3)*Rc+(row&1?Math.sqrt(3)*Rc/2:0),cy=row*1.5*Rc;
+      cells.push([[cx,cy],[0,1,2,3,4,5].map(i=>{const a=Math.PI/6+i*Math.PI/3;return [cx+Rc*Math.cos(a),cy+Rc*Math.sin(a)];})]);}
+    wall=k=>Math.sqrt(3)*Rc*(1-k);}
+  const holes=k=>{const lim=b/2-wall(k),out=[];for(const [g,v] of cells){const full=polyArea(v)*k*k,q=clipBox(v.map(z=>[g[0]+(z[0]-g[0])*k,g[1]+(z[1]-g[1])*k]),lim);
+      if(q.length>=3&&polyArea(q)>0.04*full)out.push(q);}return out;};
+  const solid=k=>1-holes(k).reduce((s,q)=>s+polyArea(q),0)/(b*b);
+  let lo=0.05,hi=0.999;for(let i=0;i<34;i++){const m=(lo+hi)/2;if(solid(m)>rel)lo=m;else hi=m;}
+  const hs=holes((lo+hi)/2);hs.solid=solid((lo+hi)/2);return hs;}
 function cellShape(kind,b,rel){
   const sh=new THREE.Shape();sh.moveTo(-b/2,-b/2);sh.lineTo(b/2,-b/2);sh.lineTo(b/2,b/2);sh.lineTo(-b/2,b/2);sh.closePath();
-  const n=Math.max(4,Math.round(b/0.016)),k=Math.sqrt(Math.max(0.02,1-rel)),poly=pts=>{const h=new THREE.Path();pts.forEach((p,i)=>i?h.lineTo(p[0],p[1]):h.moveTo(p[0],p[1]));h.closePath();sh.holes.push(h);};
-  if(kind==='sq'){const p=b/n,s=p*k/2;for(let i=0;i<n;i++)for(let j=0;j<n;j++){const cx=-b/2+(i+.5)*p,cy=-b/2+(j+.5)*p;poly([[cx-s,cy-s],[cx+s,cy-s],[cx+s,cy+s],[cx-s,cy+s]]);}}
-  else if(kind==='tri'){const p=b/n*1.15,h=p*Math.sqrt(3)/2,rows=Math.floor(b/h),y0=-rows*h/2,m=(1-k)*p*.18;
-    for(let r=0;r<rows;r++)for(let c=-2;c<2*n+2;c++){const up=(c+r)%2===0,x0=-b/2+c*p/2,yb=y0+r*h;
-      const tri=up?[[x0,yb],[x0+p,yb],[x0+p/2,yb+h]]:[[x0,yb+h],[x0+p,yb+h],[x0+p/2,yb]];const g=[(tri[0][0]+tri[1][0]+tri[2][0])/3,(tri[0][1]+tri[1][1]+tri[2][1])/3];
-      const sm=tri.map(q=>[g[0]+(q[0]-g[0])*k,g[1]+(q[1]-g[1])*k]);if(sm.every(q=>Math.abs(q[0])<b/2-m&&Math.abs(q[1])<b/2-m))poly(up?sm:sm.reverse());}}
-  else{const Rc=b/(n*Math.sqrt(3)),Rh=Rc*k,lim=b/2-(Rc-Rh)*0.9;
-    for(let row=-n*2;row<=n*2;row++)for(let c=-n*2;c<=n*2;c++){const cx=c*Math.sqrt(3)*Rc+(row&1?Math.sqrt(3)*Rc/2:0),cy=row*1.5*Rc;
-      if(Math.abs(cx)+Rh*0.87>lim||Math.abs(cy)+Rh>lim)continue;poly([0,1,2,3,4,5].map(i=>{const a=Math.PI/6+i*Math.PI/3;return [cx+Rh*Math.cos(a),cy+Rh*Math.sin(a)];}));}}
+  for(const q of cellHoles(kind,b,rel)){const h=new THREE.Path();q.forEach((p,i)=>i?h.lineTo(p[0],p[1]):h.moveTo(p[0],p[1]));h.closePath();sh.holes.push(h);}
   return sh;}
 function tubeShape(b,t){const sh=new THREE.Shape();sh.moveTo(-b/2,-b/2);sh.lineTo(b/2,-b/2);sh.lineTo(b/2,b/2);sh.lineTo(-b/2,b/2);sh.closePath();
   const h=new THREE.Path(),c=b/2-t;h.moveTo(-c,-c);h.lineTo(-c,c);h.lineTo(c,c);h.lineTo(c,-c);h.closePath();sh.holes.push(h);return sh;}
@@ -2250,15 +2312,15 @@ RIG.cells={hist:[0,0,0],histF:[0,0,0],mtype:'hex',items:[{name:'Solid bar'},{nam
     else{st='Elastic';head=i===0?'The solid bar bends':i===1?'The tube bends':'Walls along the beam stretch';why=i===0?'All the material is packed close to the centre line, where bending does little.':i===1?'All the walls sit at the outside, where bending strain is largest.':'Every wall runs along the beam, whatever the cell shape, so the walls stretch like the solid does. E falls only as ρ/ρ<sub>s</sub> while I grows much faster.';}
     return {mat:i===2?'wood':'wooddense',label:this.items[i].name,where,sign,e:s.e,pl:s.pH,fr:s.fH,band:0,steps,stage:st,head,why,
       measure:'<b>Measure it:</b> a three-point bending test. A wrinkle appears on the squeezed face before the stretched face breaks.'};},
-  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b,c.c],ser=[],marks=[];
-    m.S.forEach((s,i)=>{const k=CEL.drop*1000/s.psi,dC=s.Pc*k;
-      if(s.mode==='foam'){ser.push({pts:[[0,0],[dC,s.Pc]],c:cols[i],w:2.8});ser.push({pts:[[dC,s.Pc],[1e4,s.Pc*1.08]],c:cols[i],dash:'6 4',w:2});}
-      else{const sl=s.mode==='wood'?1.7:0.4,dB=dC+sl*(s.Pb-s.Pc)*k,pts=[[0,0],[dC,s.Pc]];for(let j=1;j<=12;j++){const f=j/12;pts.push([dC+(dB-dC)*f,s.Pc+(s.Pb-s.Pc)*Math.sqrt(f)]);}
-        ser.push({pts,c:cols[i],w:2.8});ser.push({pts:[[dB,s.Pb],[dB*1.08,s.Pb*.3],[1e4,s.Pb*.25]],c:cols[i],dash:'6 4',w:2});}
-      marks.push({x:s.drop*1000+Math.sin(s.rot)*CEL.L*1000,y:m.P,c:cols[i]});});
+  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b,c.c],ser=[],marks=[],fails=[],f=CEL.dmm;
+    m.S.forEach((s,i)=>{const k=CEL.drop*1000*f/s.psi,dC=s.Pc*k;
+      if(s.mode==='foam'){ser.push({pts:[[0,0],[dC,s.Pc]],c:cols[i],w:2.8});ser.push({pts:[[dC,s.Pc],[1e4,s.Pc*1.08]],c:cols[i],dash:'6 4',w:2});fails.push({x:dC,y:s.Pc,c:cols[i],label:sig(dC,2)+' mm'});}
+      else{const sl=s.mode==='wood'?1.7:0.4,dB=dC+sl*(s.Pb-s.Pc)*k,pts=[[0,0],[dC,s.Pc]];for(let j=1;j<=12;j++){const q=j/12;pts.push([dC+(dB-dC)*q,s.Pc+(s.Pb-s.Pc)*Math.sqrt(q)]);}
+        ser.push({pts,c:cols[i],w:2.8});ser.push({pts:[[dB,s.Pb],[dB*1.08,s.Pb*.3],[1e4,s.Pb*.25]],c:cols[i],dash:'6 4',w:2});fails.push({x:dB,y:s.Pb,c:cols[i],label:sig(dB,2)+' mm'});}
+      marks.push({x:(s.drop*1000+Math.sin(s.rot)*CEL.L*1000)*f,y:m.P,c:cols[i]});});
     const ymax=Math.max(1.25,Math.min(5.2,Math.max(...m.S.map(s=>s.Pb))*1.12),m.P*1.08);
-    plot(svg,{x:{min:0,max:Math.max(200,1.15*CEL.drop*1000*(CEL.cr+1.7*(1-CEL.cr))),label:'Tip deflection δ (mm)'},y:{min:0,max:ymax,label:'Tip load F / F₀'},series:ser,marks,hl:[{v:m.P,c:c.cr,dash:'1 0',w:1}]});
-    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.c,t:CELL_KINDS[m.kind]},{c:c.mu,t:'after failure',dash:1}]);},
+    plot(svg,{x:{min:0,max:f*Math.max(200,1.15*CEL.drop*1000*(CEL.cr+1.7*(1-CEL.cr))),label:'Tip deflection δ (mm)'},y:{min:0,max:ymax,label:'Tip load F / F₀'},series:ser,marks,fails,hl:[{v:m.P,c:c.cr,dash:'1 0',w:1}]});
+    legend(leg,[{c:c.a,t:'Solid bar'},{c:c.b,t:'Tube'},{c:c.c,t:CELL_KINDS[m.kind]},{c:c.mu,t:'after failure',dash:1},{c:c.mu,t:'○ fails at δ',ring:1}]);},
   chartDesign(svg,leg){const c=SER(),m=this.model(),E=m.foam?m.rel*m.rel*CEL.Es:m.rel*CEL.Es;
     ashbyChart(svg,{solid:[CEL.rs,CEL.Es],solidLabel:'cell-wall solid',lines:[{slope:1,c:c.b,label:'aligned cells: E ~ ρ',at:.8},{slope:2,c:c.c,label:'foam: E ~ ρ²',at:.9}],
       points:[{x:m.rel*CEL.rs,y:E,c:m.foam?c.c:c.b,label:sig(E)+' GPa',dx:-10,anchor:'end'}]});
@@ -2411,8 +2473,9 @@ RIG.lattice={hist:[0,0],histF:[0,0],types:['octet','gyroid'],items:[{x:-0.3},{x:
       if(s.T.mode==='plateau'){ser.push({pts:[[0,0],[ey,s.sf],[ey*1.4,s.sf*1.05],[xmax*.8,s.sf*1.12]],c:cols[i],w:2.8},{pts:[[xmax*.8,s.sf*1.12],[xmax*1.2,s.sf*1.6]],c:cols[i],dash:'6 4',w:2});}
       else{ser.push({pts:[[0,0],[ey,s.sf]],c:cols[i],w:2.8},{pts:[[ey,s.sf],[ey*1.12,s.sf*.45],[xmax*1.2,s.sf*.5]],c:cols[i],dash:'6 4',w:2});}
       marks.push({x:Math.min(m.s,s.sf)/s.E*100*(1+(s.T.mode==='plateau'?2*s.fH:.5*s.fH)),y:Math.min(m.s,s.T.mode==='plateau'?s.sf*1.1:s.sf),c:cols[i]});});
-    plot(svg,{x:{min:0,max:xmax,label:'Strain ε (%)'},y:{min:0,max:Math.max(...m.S.map(s=>s.sf))*1.35,label:'Stress σ (MPa)'},series:ser,hl:[{v:m.s,c:c.cr,dash:'1 0',w:1}],marks});
-    legend(leg,[{c:c.b,t:'A · '+m.S[0].T.name},{c:c.c,t:'B · '+m.S[1].T.name},{c:c.mu,t:'after failure',dash:1}]);},
+    const fails=m.S.map((s,i)=>({x:s.sf/s.E*100,y:s.sf,c:cols[i],label:fmt(s.sf/s.E*100,2)+'%'}));
+    plot(svg,{x:{min:0,max:xmax,label:'Strain ε (%)'},y:{min:0,max:Math.max(...m.S.map(s=>s.sf))*1.35,label:'Stress σ (MPa)'},series:ser,hl:[{v:m.s,c:c.cr,dash:'1 0',w:1}],marks,fails});
+    legend(leg,[{c:c.b,t:'A · '+m.S[0].T.name},{c:c.c,t:'B · '+m.S[1].T.name},{c:c.mu,t:'after failure',dash:1},{c:c.mu,t:'○ fails at ε',ring:1}]);},
   chartDesign(svg,leg){const c=SER(),m=this.model(),cols=[c.b,c.c];
     ashbyChart(svg,{solid:[LAT.rs,LAT.Es/1000],solidLabel:'Ti-6Al-4V',lines:[{slope:1,c:c.mu,label:'stretch: E ~ ρ',at:.7},{slope:2,c:c.mu,label:'bend: E ~ ρ²',at:.85}],
       points:m.S.map((s,i)=>({x:m.rel*LAT.rs,y:s.E/1000,c:cols[i],label:(i?'B ':'A ')+s.T.short,dx:-10,anchor:'end'}))});
@@ -2466,13 +2529,13 @@ RIG.sheet={hist:[0,0],histY:[0,0],histF:[0,0],items:[{name:'Flat sheet',x:-.2},{
     else{st='Elastic';head='Elastic: top stretches, bottom squeezes';why=i?'The wave moves steel far from the middle of the section, so the same load gives far less strain: φ<sub>f</sub> = (2a + t)/t.':'All of the steel sits within 1 mm of the middle of the section, so it bends easily and the surface strain climbs fast.';}
     return {mat:'galv',label:this.items[i].name,where:'top face, at the clamp',sign:1,e:s.e,pl:0.35*s.yH+0.65*s.pH,fr:s.fH,band:0,steps,stage:st,head,why,
       measure:'<b>Measure it:</b> hang known weights and read the tip drop with a ruler or dial gauge; the slope of load vs drop gives EI.'};},
-  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b],ser=[],marks=[];let xmax=0;
+  chartTest(svg,leg){const c=SER(),m=this.model(),cols=[c.a,c.b],ser=[],marks=[],fails=[];let xmax=0;
     m.S.forEach((s,i)=>{const k=SHT.L**3/(3*SHT.E*SHT.I0*s.phe)*1000,pts=[[0,0],[s.Fy*k,s.Fy]];for(let j=1;j<=16;j++){const y=j/16,f=s.Fy+(s.Fp-s.Fy)*y;pts.push([f*k*(1+0.8*y*y),f]);}
-      const end=pts[pts.length-1];xmax=Math.max(xmax,end[0]*1.5);ser.push({pts,c:cols[i],w:2.8},{pts:[end,[1e5,s.Fp*1.03]],c:cols[i],dash:'6 4',w:2});
+      const end=pts[pts.length-1];xmax=Math.max(xmax,end[0]*1.5);ser.push({pts,c:cols[i],w:2.8},{pts:[end,[1e5,s.Fp*1.03]],c:cols[i],dash:'6 4',w:2});fails.push({x:end[0],y:end[1],c:cols[i],label:sig(end[0],2)+' mm'});
       marks.push({x:s.drop*1000+Math.sin(s.rot)*SHT.L*1000,y:m.F,c:cols[i]});});
-    plot(svg,{x:{min:0,max:Math.min(xmax,480),label:'Tip deflection δ (mm)'},y:{min:0,max:Math.max(m.S[1].Fp*1.15,m.F*1.1,160),label:'Tip load F (N)'},series:ser,marks,
+    plot(svg,{x:{min:0,max:Math.min(xmax,480),label:'Tip deflection δ (mm)'},y:{min:0,max:Math.max(m.S[1].Fp*1.15,m.F*1.1,160),label:'Tip load F (N)'},series:ser,marks,fails,
       hl:[{v:m.F,c:c.cr,dash:'1 0',w:1}],texts:[{x:Math.min(xmax,480),y:m.S[0].Fp,t:'flat sheet folds',anchor:'end',dy:-7,c:c.a}]});
-    legend(leg,[{c:c.a,t:'Flat sheet'},{c:c.b,t:'Corrugated'},{c:c.mu,t:'after the fold forms',dash:1},{c:c.cr,t:'applied load'}]);},
+    legend(leg,[{c:c.a,t:'Flat sheet'},{c:c.b,t:'Corrugated'},{c:c.mu,t:'after the fold forms',dash:1},{c:c.mu,t:'○ folds at δ',ring:1},{c:c.cr,t:'applied load'}]);},
   chartDesign(svg,leg){const c=SER(),m=this.model(),pe=[],pf=[];for(let i=0;i<=100;i++){const x=5*i/100;pe.push([x,(2*x+1)**2]);pf.push([x,2*x+1]);}
     plot(svg,{x:{min:0,max:5,label:'Wave amplitude / thickness a/t'},y:{min:1,max:150,log:true,label:'Gain over the flat sheet φ',ticks:[1,2,5,10,20,50,100]},
       series:[{pts:pe,c:c.b,w:2.8},{pts:pf,c:c.c,w:2.8}],vl:[{v:m.at,c:c.mu,dash:'2 3'}],
@@ -2579,6 +2642,96 @@ const h0=(location.hash||'').slice(1);show(TABIDS.includes(h0)?h0:'column');
 (function loop(now){requestAnimationFrame(loop);now=now||performance.now();stepPlay(now);
   if(HAS3D){controls.update();R.render(scene,camera);placeTags();}
   if(!document.hidden)MIC.frame(now);})();
+
+/* ---- 45-experiments.js ---- */
+/* ===================== experiments: in-class predict–observe–explain guide, one or more per tab =====================
+   Each entry: tab, title, ask (what to ask the class), setup (steps shown), set (slider values), types (segment picks),
+   watch (what to look for), answer (folded HTML). "Load setup" puts the lab in that state with the load at zero.
+   Numbers are the lab's own model values (v8, 2026-10-20); re-check them if a model changes. */
+const EXPS=[
+{tab:'column',n:1,title:'Which column buckles first?',
+ ask:'A solid steel bar and a steel tube have the same mass and the same length, 3 m. Push down on both. Which one gives way first, and how much more does the other one carry?',
+ setup:['Tab 1, Columns','Length <i>L</i> = 3.00 m','Load at zero','Chart: Test curve'],set:{'c-L':3,'c-F':0},
+ watch:['Press ▶. The load rises to 200 kN.','Watch each column bow sideways, then fold.','The ring on each curve marks its collapse. The number under it is the sideways bow at that moment.'],
+ answer:`<p><b>The solid bar goes first, at 4.6 kN. The tube holds until 44 kN, about 9.5 times as much.</b></p>
+ <p>A slender column fails by buckling: it bows sideways, and the bow grows until the steel yields. The buckling load is <i>F</i><sub>c</sub> = π²<i>EI</i>/<i>L</i>². Both columns use the same steel (same <i>E</i>) and the same area <i>A</i>. The difference is <i>I</i>, which measures how far the metal sits from the centre line. The tube puts its metal out at radius 28.7 mm. Its shape factor is about <i>r</i>/<i>t</i> ≈ 10 times the bar's, so it carries about 10 times the load.</p>
+ <p>Bow at collapse: the bar 126 mm (off the chart, shown by the arrow), the tube 44 mm.</p>`},
+{tab:'column',n:1,then:1,title:'Then try: make them short',
+ ask:'Cut both columns to 1 m. Does the tube still win by 10 times?',
+ setup:['Length <i>L</i> = 1.00 m','Load at zero'],set:{'c-L':1,'c-F':0},
+ watch:['Press ▶ and compare the two collapse loads.'],
+ answer:`<p><b>No, only by 4.6 times (162 kN against 35 kN).</b> At 1 m the tube is too stocky to buckle. Instead it squashes: the steel yields at σ<sub>y</sub> = 355 MPa, almost at the squash load σ<sub>y</sub><i>A</i> = 186 kN. The squash load depends only on the area, which is the same for both columns. Shape helps against buckling, not against crushing.</p>`},
+
+{tab:'wall',n:2,title:'Thinner wall, same metal: stronger forever?',
+ ask:'Spread the same 150 mm² of aluminium into a wider, thinner tube. Does it keep getting stronger? Which tube would you rather stand under when it fails?',
+ setup:['Tab 2, Thin walls','<i>r</i>/<i>t</i> = 10 (31 mm tube, 1.5 mm wall)','Load at zero','Chart: Test curve'],set:{'w-k':0.231,'w-F':0},
+ watch:['Press ▶. Note the load when the curve bends over (first yield) and where it levels off (plastic hinge).','Then load the second setup below and compare.'],
+ answer:`<p><b><i>r</i>/<i>t</i> = 10:</b> the surface first yields at 579 N. The tube then carries up to 737 N while the yielding spreads through the wall. A plastic hinge forms at about 40 mm of tip deflection, and the load levels off. This failure is slow and gives plenty of warning.</p>`},
+{tab:'wall',n:2,then:1,title:'Then try: a very thin wall',
+ ask:'Same metal, now <i>r</i>/<i>t</i> = 80 (an 88 mm tube with a 0.55 mm wall). Is it stronger or weaker?',
+ setup:['<i>r</i>/<i>t</i> = 80','Load at zero'],set:{'w-k':0.926,'w-F':0},
+ watch:['Press ▶. Watch the squeezed underside near the clamp.','Switch to the Design chart to see the whole range of <i>r</i>/<i>t</i>.'],
+ answer:`<p><b>It carries more (1,017 N) but fails suddenly.</b> The squeezed wall wrinkles (kinks) before the metal has yielded anywhere, at only 4.3 mm of deflection, and the load drops. The best tube is at <i>r</i>/<i>t</i> ≈ 39, at 1,457 N. Below that, thinner walls help, because the metal moves away from the centre line. Above it, the wall is too thin to stay flat under compression. Ashby's limit, φ<sub>max</sub> ≈ 2.3(<i>E</i>/σ<sub>f</sub>)<sup>½</sup> ≈ 38 (Eq 11.15a), predicts the same crossover.</p>`},
+
+{tab:'cells',n:3,title:'Solid, tube or hexagons: which fails first?',
+ ask:'Three wooden beams have the same mass of the same cell-wall material: a 40 mm solid bar, an 80 mm square tube and an 80 mm block of hexagonal cells. Hang a load on the end of each. Which one fails first, and why? Then: how far does each one bend before it breaks?',
+ setup:['Tab 3, Cells','Inside the cellular beam: Hexagons','Relative density ρ/ρ<sub>s</sub> = 0.25','Load at zero','Chart: Test curve'],set:{'m-r':0.25,'m-P':0},cells:'hex',
+ watch:['Press ▶. The load rises to 5 F₀ in about 7 seconds. Press Space to pause.','First a crease appears on the squeezed (lower) face, then the stretched (upper) face splinters.','The ring on each curve marks its break. The number under it is the tip deflection at the break.'],
+ answer:`<table><thead><tr><th></th><th>Solid bar</th><th>Hexagons</th><th>Tube</th></tr></thead><tbody>
+ <tr><td>Stiffer than the bar, ψ</td><td>1×</td><td>4×</td><td>7×</td></tr>
+ <tr><td>Creases (first damage)</td><td>0.55 F₀ · 12 mm</td><td>1.10 F₀ · 5.9 mm</td><td>1.93 F₀ · 5.9 mm</td></tr>
+ <tr><td>Breaks</td><td>1.00 F₀ · 28 mm</td><td>2.0 F₀ · 14 mm</td><td>3.5 F₀ · 14 mm</td></tr></tbody></table>
+ <p><b>By load, the solid bar fails first, then the hexagons, then the tube.</b> Wood does not yield like steel. Its first damage is a crease (a kink band) on the squeezed face. This happens at 55% of the breaking load, because wood crushes along the grain at about 39 MPa but breaks in bending at about 70 MPa. The stress on the face is <i>M</i>/<i>Z</i>, where <i>Z</i> is the section modulus, so for the same moment the beam with the largest <i>Z</i> lasts longest. For the same mass, <i>Z</i> is 1 for the bar, 2 for the hexagons (= (ρ<sub>s</sub>/ρ)<sup>½</sup>) and 3.5 for the tube. The tube beats the hexagons because all of its wood sits at the faces, where the bending stress is largest. The hexagons spread their wood evenly through the depth, so the walls near the middle do little work.</p>
+ <p><b>By deflection, the order flips.</b> The tube and the hexagons both break at 14 mm, half the bar's 28 mm. Wood breaks at a fixed strain, and the strain on the face is the half-depth <i>c</i> divided by the bend radius. A beam twice as deep therefore reaches that strain at half the bend: δ<sub>f</sub> ≈ ε<sub>f</sub><i>L</i>²/3<i>c</i>. Both deep beams are 80 mm (<i>c</i> = 40 mm), so they break at the same deflection. They are stiffer and stronger, but they give half the warning.</p>
+ <p><b>Do they really have the same mass?</b> Yes. The hexagon block is 80 × 80 mm with 75% of its section empty: 0.25 × 80² = 1,600 mm², the same as the 40 × 40 mm bar. The tube's 5.4 mm wall also adds up to 1,600 mm².</p>
+ <p class="note">The chart's millimetres are elastic values for the cell-wall solid (<i>E</i> 35 GPa). The 3D view draws the bending about 6 times larger so it can be seen; the ratios between the beams are the same.</p>`},
+{tab:'cells',n:3,then:1,title:'Then try: very light beams',
+ ask:'Make all three much lighter, at ρ/ρ<sub>s</sub> = 0.05. The tube is now 179 mm wide with a 2.3 mm wall. Does the tube still win?',
+ setup:['Relative density ρ/ρ<sub>s</sub> = 0.05','Load at zero'],set:{'m-r':0.05,'m-P':0},cells:'hex',
+ watch:['Press ▶. Watch the tube’s squeezed wall.'],
+ answer:`<p><b>No.</b> The tube is still the stiffest (39× against 20×), but its thin wall wrinkles at 2.6 F₀ and the tube folds at 2.9 F₀. The hexagons hold until 4.5 F₀, because their inner walls brace one another and keep each wall flat. This is the thin-wall limit from tab 2 again, and it is why wood, bone and aircraft panels fill their sections with cells instead of using hollow tubes.</p>`},
+{tab:'cells',n:3,then:1,title:'Then try: foam instead of aligned cells',
+ ask:'Keep ρ/ρ<sub>s</sub> = 0.25 but switch the inside to Foam. Is it better or worse than the hexagons?',
+ setup:['Inside the cellular beam: Foam','Relative density ρ/ρ<sub>s</sub> = 0.25','Load at zero'],set:{'m-r':0.25,'m-P':0},cells:'foam',
+ watch:['Press ▶, then switch to the Design chart.'],
+ answer:`<p><b>Much worse: no stiffer than the solid bar (ψ = 1), and it starts crushing at 0.17 F₀.</b> In a foam the walls meet at angles, so the load bends them instead of stretching them. Then <i>E</i> falls as (ρ/ρ<sub>s</sub>)² (Eq 13.18), which cancels the gain from the larger section. On the Design chart, aligned cells follow the slope-1 line and the foam follows slope 2.</p>`},
+
+{tab:'lattice',n:4,title:'Which lattice holds more?',
+ ask:'Two printed titanium lattices have the same density, 0.15. A is an octet truss and B is an open lattice. Place your bets: which one holds more stress?',
+ setup:['Tab 4, Lattices','A: Octet · B: Open','Relative density ρ/ρ<sub>s</sub> = 0.15','Stress at zero','Students bet A or B (the bet buttons keep a streak)'],set:{'l-r':0.15,'l-P':0},lat:['octet','bcc'],
+ watch:['Press ▶. The stress rises to 160 MPa.','Watch where each lattice snaps: along a 45° band.'],
+ answer:`<p><b>The octet: 50 MPa against 17 MPa (2.9×). It is also 2.2× stiffer (5.8 against 2.6 GPa).</b> In the octet every node has 12 struts, enough that the struts can only stretch to let the lattice deform (Maxwell's rule, Eq 13.3). In the open lattice each node has only 8 struts, so they bend. Stretching is stiff, and <i>E</i> scales with ρ; bending is soft, and <i>E</i> scales with ρ². The Design chart shows the two slopes.</p>`},
+{tab:'lattice',n:4,then:1,title:'Then try: how does each one fail?',
+ ask:'Now compare the octet with a gyroid at density 0.40. Both hold about the same stress. Which would you put in a crash helmet or a bone implant?',
+ setup:['A: Octet · B: Gyroid','Relative density ρ/ρ<sub>s</sub> = 0.40','Stress at zero'],set:{'l-r':0.4,'l-P':0},lat:['octet','gyroid'],
+ watch:['Press ▶ and look at the shape of each curve after its peak.'],
+ answer:`<p><b>The gyroid.</b> The octet snaps along a 45° band and its load drops, which is brittle. The gyroid sheet yields and then crushes layer by layer along a long flat plateau, so it soaks up energy at a steady stress. Compare the shapes of the curves, not the heights of the peaks: the octet numbers are ideal theory, while the gyroid values come from measured printed parts (Naghavi et al. 2022).</p>`},
+
+{tab:'sheet',n:5,title:'How much does a wave help?',
+ ask:'The same 2 mm steel sheet, flat or corrugated with waves 3 times the sheet thickness. Predict two numbers: how much stiffer is it, and how much stronger?',
+ setup:['Tab 5, Corrugation','Wave amplitude <i>a</i>/<i>t</i> = 3','Load at zero','Chart: Test curve'],set:{'s-a':3,'s-P':0},
+ watch:['Press ▶. Note the load at which each sheet folds.','Switch to the Design chart for the two gain curves.'],
+ answer:`<p><b>49× stiffer but only about 7× stronger.</b> The wave moves steel up to ±<i>a</i> from the middle of the section. Stiffness depends on <i>I</i>, which grows as (2<i>a</i> + <i>t</i>)²/<i>t</i>² = 49 (Eq 12.8). Strength depends on <i>Z</i> = <i>I</i>/<i>c</i>, and the outermost fibre <i>c</i> moves out too, so the gain is only (2<i>a</i> + <i>t</i>)/<i>t</i> = 7 (Eq 12.9). In the test the flat sheet folds at 120 N and the corrugated one at 730 N (6.1×; a flat strip has a little more plastic reserve). The flat sheet bends 588 mm before it folds (the arrow, off the chart), the corrugated one only 73 mm.</p>`},
+];
+const TABNAME={column:'Columns',wall:'Thin walls',cells:'Cells',lattice:'Lattices',sheet:'Corrugation'};
+$('exp-list').innerHTML=EXPS.map((e,i)=>`<article class="exp${e.then?' then':''}">
+  <header>${e.then?'':`<span class="tk">${e.n} · ${TABNAME[e.tab]}</span>`}<h4>${e.title}</h4><button class="ib go" type="button" data-x="${i}">Load setup</button></header>
+  <p class="ask">${e.ask}</p>
+  <div class="cols"><div><h5>Set up</h5><ol>${e.setup.map(s=>`<li>${s}</li>`).join('')}</ol></div><div><h5>Run and watch</h5><ul>${e.watch.map(s=>`<li>${s}</li>`).join('')}</ul></div></div>
+  <details><summary>Answer and why</summary>${e.answer}</details></article>`).join('');
+function loadExp(e){openExp(false);if(cur!==e.tab)show(e.tab);stopPlay();growChart(false);
+  if(e.cells){RIG.cells.mtype=e.cells;document.querySelectorAll('#m-type button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.t===e.cells));}
+  if(e.lat){RIG.lattice.types=e.lat.slice();syncLatticeSeg();RIG.lattice.bet=null;RIG.lattice.betDone=false;document.querySelectorAll('#l-bet button[data-b]').forEach(x=>x.setAttribute('aria-pressed',false));}
+  for(const id in e.set)$(id).value=e.set[id];
+  chartKind='test';document.querySelectorAll('#ch-pick button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.c==='test'));
+  clearHist(RIG[cur]);RIG[cur].build();refresh();resetView();MIC.snap();}
+function openExp(on){$('experiments').hidden=!on;if(on){$('experiments').querySelector('.box').scrollTop=0;$('exp-h').focus({preventScroll:true});}}
+$('exp-list').addEventListener('click',ev=>{const b=ev.target.closest('button[data-x]');if(b)loadExp(EXPS[+b.dataset.x]);});
+$('b-exp').addEventListener('click',()=>openExp(true));$('b-exp-close').addEventListener('click',()=>openExp(false));
+$('experiments').addEventListener('click',ev=>{if(ev.target.id==='experiments')openExp(false);});
+document.addEventListener('keydown',ev=>{if(ev.metaKey||ev.ctrlKey||ev.altKey)return;const k=ev.key.toLowerCase();
+  if(k==='escape'&&!$('experiments').hidden)openExp(false);else if(k==='e'&&!(ev.target.closest&&ev.target.closest('input[type=text],textarea')))openExp($('experiments').hidden);});
+if(h0==='experiments')openExp(true);
 
 })();
 </script>

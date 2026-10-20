@@ -14,12 +14,14 @@ Interactive 3D test rigs for **ES 192: Materials Selection in Mechanical Design*
 
 Each tab has a microscope strip (grains and atoms) that follows the load: elastic stretch, slip, kinking and fracture.
 
+**Experiments** ([#experiments](https://seymurhh.github.io/es192-shape-lab/#experiments), or press `E`) is a predict-then-test guide with ten in-class experiments, at least one per tab. Each experiment has the question to ask, the setup steps, a **Load setup** button that puts the lab in that state with the load at zero, what to watch, and a folded answer that explains why. Every test curve marks where each specimen fails, and the deflection (or strain) at that point.
+
 ## Using it in class
 
 - **Play** (▶ or Space) ramps the load; **New specimen** (N) resets a broken part.
 - **Strain colours** (S) colour the part, and the atoms in the microscope, from blue (low) to red (failure).
 - **Labels** (L) show forces, supports and section sizes; they are off by default.
-- `1`–`5` switch tabs, `P` toggles Present mode (full screen), `R` resets the view. **Sources** lists every equation with its Ashby 6e number and page.
+- `1`–`5` switch tabs, `P` toggles Present mode (full screen), `R` resets the view, `E` opens the Experiments. **Sources** lists every equation with its Ashby 6e number and page.
 
 ## Embed in Canvas
 
